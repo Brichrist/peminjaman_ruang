@@ -129,41 +129,6 @@ class SimpleDataSeeder extends Seeder
         }
 
         // Create some sample bookings for demonstration
-        $this->command->info('Creating sample bookings...');
-
-        // Booking 1: Budi books Hall Tempat Ibadah for tomorrow
-        Booking::create([
-            'user_id' => $user1->id,
-            'room_id' => 1, // HALL TEMPAT IBADAH
-            'booking_date' => Carbon::tomorrow()->format('Y-m-d'),
-            'start_time' => '09:00:00',
-            'end_time' => '11:00:00',
-            'activity' => 'Ibadah Mingguan',
-            'status' => 'approved'
-        ]);
-
-        // Booking 2: Sarah books Ruang Meeting for tomorrow
-        Booking::create([
-            'user_id' => $user2->id,
-            'room_id' => 4, // RUANG MEETING
-            'booking_date' => Carbon::tomorrow()->format('Y-m-d'),
-            'start_time' => '14:00:00',
-            'end_time' => '16:00:00',
-            'activity' => 'Rapat Tim',
-            'status' => 'approved'
-        ]);
-
-        // Booking 3: Budi books Auditorium for next week
-        Booking::create([
-            'user_id' => $user1->id,
-            'room_id' => 10, // AUDITORIUM
-            'booking_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
-            'start_time' => '18:00:00',
-            'end_time' => '20:00:00',
-            'activity' => 'Konser Musik',
-            'status' => 'approved'
-        ]);
-
         $this->command->info('Data seeding completed successfully!');
         $this->command->info('Admin: admin@nicc.com / password');
         $this->command->info('User 1: budi@gmail.com / password');
