@@ -1,0 +1,65 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(php artisan make:migration:*)",
+      "Bash(cat:*)",
+      "Bash(py:*)",
+      "Bash(cp:*)",
+      "Bash(python:*)",
+      "Bash(rm:*)",
+      "Bash(touch:*)",
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)",
+      "Bash(php artisan migrate:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \".claude/sleek_notify.py\" UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \".claude/sleek_notify.py\" Stop"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \".claude/sleek_notify.py\" SubagentStop"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \".claude/sleek_notify.py\" Notification"
+          }
+        ]
+      }
+    ]
+  }
+}
