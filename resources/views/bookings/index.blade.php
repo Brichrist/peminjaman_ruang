@@ -1,8 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Daftar Peminjaman') }}
+        <h2 class="font-semibold text-xl leading-tight">
+            Daftar Peminjaman
         </h2>
+        <p class="text-blue-100 text-sm mt-1">Kelola dan pantau riwayat peminjaman ruangan Anda</p>
     </x-slot>
 
     <div class="py-12">
@@ -12,11 +13,8 @@
                     <div class="mb-4 flex justify-between items-center">
                         <h3 class="text-lg font-semibold">Riwayat Peminjaman</h3>
                         <div class="flex gap-2">
-                            <a href="{{ route('bookings.schedule') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            <a href="{{ route('bookings.room-schedule') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                                 Lihat Jadwal Ruangan
-                            </a>
-                            <a href="{{ route('bookings.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                Buat Peminjaman Baru
                             </a>
                         </div>
                     </div>

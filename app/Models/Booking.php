@@ -23,9 +23,7 @@ class Booking extends Model
     ];
 
     protected $casts = [
-        'booking_date' => 'date',
-        'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i'
+        'booking_date' => 'date'
     ];
 
     public function user()
@@ -97,12 +95,10 @@ class Booking extends Model
             ->where('booking_date', $date)
             ->where('status', 'approved')
             ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime])
-                      ->orWhere(function ($q) use ($startTime, $endTime) {
-                          $q->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                      });
+                // Check for overlapping time slots
+                // Two time ranges overlap if start1 < end2 AND end1 > start2
+                $query->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
             })
             ->exists();
     }

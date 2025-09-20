@@ -1,9 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             Jadwal & Peminjaman Ruangan
         </h2>
+        <p class="text-blue-100 text-sm mt-1">jadwalkan peminjaman ruangan Anda</p>
     </x-slot>
+
+    @include('components.toast-notification')
 
     <div class="py-6 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +30,7 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button onclick="refreshSchedule()"
+                        <button id="refresh-btn"
                                 class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -82,8 +85,7 @@
                                            bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300"
                                     data-time="{{ $slot }}"
                                     data-room-id="{{ $room->id }}"
-                                    data-room-name="{{ $room->name }}"
-                                    onclick="toggleTimeSlot(this)">
+                                    data-room-name="{{ $room->name }}">
                                     {{ $slot }}
                                 </button>
                             @endforeach
@@ -91,12 +93,12 @@
 
                         <!-- Quick Action Buttons -->
                         <div class="mt-4 flex gap-2">
-                            <button onclick="selectAllAvailable({{ $room->id }})"
-                                    class="flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200">
+                            <button class="select-all-btn flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
+                                    data-room-id="{{ $room->id }}">
                                 Pilih Semua Tersedia
                             </button>
-                            <button onclick="clearSelection({{ $room->id }})"
-                                    class="flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200">
+                            <button class="clear-selection-btn flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
+                                    data-room-id="{{ $room->id }}">
                                 Hapus Pilihan
                             </button>
                         </div>
@@ -110,7 +112,7 @@
                 <div class="text-sm font-medium text-gray-700 mb-2">
                     <span id="selected-count">0</span> slot terpilih
                 </div>
-                <button onclick="openBookingModal()"
+                <button id="create-booking-btn"
                         class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
                     Buat Peminjaman
                 </button>
@@ -124,7 +126,7 @@
             <div class="sticky top-0 bg-white border-b px-6 py-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-semibold text-gray-900">Formulir Peminjaman</h3>
-                    <button onclick="closeBookingModal()" class="text-gray-400 hover:text-gray-600">
+                    <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -191,7 +193,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3">
-                    <button type="button" onclick="closeBookingModal()"
+                    <button type="button" id="cancel-modal-btn"
                             class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200">
                         Batal
                     </button>
@@ -206,23 +208,61 @@
 
     <!-- WhatsApp Contact Modal -->
     <div id="wa-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full">
+        <div class="bg-white rounded-xl max-w-md w-full shadow-2xl">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-xl">
+                <h3 class="text-xl font-semibold flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                    </svg>
+                    Informasi Peminjam
+                </h3>
+            </div>
+
             <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Hubungi Peminjam</h3>
-                <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p class="text-sm text-gray-600 mb-2">Peminjam:</p>
-                    <p class="font-medium text-gray-900" id="wa-borrower-name"></p>
-                    <p class="text-sm text-gray-600 mt-3 mb-2">Kegiatan:</p>
-                    <p class="text-gray-900" id="wa-activity"></p>
+                <div class="bg-gray-50 rounded-lg p-4 mb-4 space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Nama Peminjam</p>
+                        <p class="text-gray-900 font-medium flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <span id="wa-borrower-name"></span>
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Kegiatan</p>
+                        <p class="text-gray-900 flex items-start">
+                            <svg class="w-4 h-4 mr-2 mt-0.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span id="wa-activity"></span>
+                        </p>
+                    </div>
                 </div>
+
+                <div id="no-wa-message" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <p class="text-sm text-yellow-700">
+                            Nomor WhatsApp tidak tersedia untuk peminjam ini
+                        </p>
+                    </div>
+                </div>
+
                 <div class="flex gap-3">
-                    <button onclick="closeWaModal()"
-                            class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200">
+                    <button id="close-wa-modal"
+                            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
                         Tutup
                     </button>
                     <a id="wa-link" href="#" target="_blank"
-                       class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 text-center">
-                        Buka WhatsApp
+                       class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 text-center flex items-center justify-center font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                        </svg>
+                        Hubungi via WhatsApp
                     </a>
                 </div>
             </div>
@@ -231,314 +271,396 @@
 
     @push('scripts')
     <script>
-        let selectedSlots = new Map(); // Map of roomId -> Set of selected times
-        let existingBookings = new Map(); // Map of roomId -> bookings array
+        $(document).ready(function() {
+            let selectedSlots = new Map();
+            let existingBookings = new Map();
 
-        // Make functions globally accessible
-        window.toggleTimeSlot = toggleTimeSlot;
-        window.selectAllAvailable = selectAllAvailable;
-        window.clearSelection = clearSelection;
-        window.openBookingModal = openBookingModal;
-        window.closeBookingModal = closeBookingModal;
-        window.refreshSchedule = refreshSchedule;
-        window.closeWaModal = closeWaModal;
+            // Initialize page
+            initializePage();
 
-        function initializePage() {
-            document.getElementById('booking-date').addEventListener('change', refreshSchedule);
-            document.getElementById('room-filter').addEventListener('change', filterRooms);
-            refreshSchedule();
-        }
+            function initializePage() {
+                // Load initial schedule
+                refreshSchedule();
 
-        function filterRooms() {
-            const filterId = document.getElementById('room-filter').value;
-            const roomCards = document.querySelectorAll('.room-card');
+                // Bind events using jQuery
+                $('#booking-date').on('change', refreshSchedule);
+                $('#room-filter').on('change', filterRooms);
+                $('#refresh-btn').on('click', refreshSchedule);
 
-            roomCards.forEach(card => {
-                if (filterId === '' || card.dataset.roomId === filterId) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        async function refreshSchedule() {
-            const date = document.getElementById('booking-date').value;
-
-            // Clear all selections
-            selectedSlots.clear();
-            updateFloatingAction();
-
-            // Fetch bookings for all rooms
-            const rooms = @json($rooms->pluck('id'));
-
-            for (const roomId of rooms) {
-                await fetchRoomBookings(roomId, date);
-            }
-        }
-
-        async function fetchRoomBookings(roomId, date) {
-            try {
-                const response = await fetch('{{ route("bookings.check-availability") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        room_id: roomId,
-                        date: date
-                    })
+                // Time slot selection using event delegation
+                $(document).on('click', '.time-slot:not(.booked)', function(e) {
+                    e.preventDefault();
+                    toggleTimeSlot($(this));
                 });
 
-                const data = await response.json();
-                existingBookings.set(roomId, data.bookings || []);
-                updateRoomSlots(roomId);
-            } catch (error) {
-                console.error('Error fetching bookings:', error);
-            }
-        }
+                // Booked slot click - show WhatsApp contact
+                $(document).on('click', '.time-slot.booked', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-        function updateRoomSlots(roomId) {
-            const container = document.querySelector(`.time-slots-container[data-room-id="${roomId}"]`);
-            if (!container) return;
+                    // Get booking data from attribute
+                    const bookingDataStr = $(this).attr('data-booking');
+                    const roomName = $(this).data('room-name');
 
-            const bookings = existingBookings.get(roomId) || [];
-            const slots = container.querySelectorAll('.time-slot');
+                    console.log('Clicked booked slot, data:', bookingDataStr); // Debug
 
-            slots.forEach(slot => {
-                const slotTime = slot.dataset.time + ':00';
-                let isBooked = false;
-                let bookingInfo = null;
-
-                for (const booking of bookings) {
-                    if (isTimeInRange(slotTime, booking.start_time, booking.end_time)) {
-                        isBooked = true;
-                        bookingInfo = booking;
-                        break;
+                    if (bookingDataStr) {
+                        try {
+                            const bookingData = JSON.parse(bookingDataStr);
+                            showWaContact(bookingData, roomName);
+                        } catch (err) {
+                            console.error('Error parsing booking data:', err);
+                            alert('Error loading booking information');
+                        }
+                    } else {
+                        console.warn('No booking data found for this slot');
                     }
-                }
+                });
 
-                // Reset classes
-                slot.className = 'time-slot px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200';
+                // Quick action buttons
+                $(document).on('click', '.select-all-btn', function() {
+                    const roomId = parseInt($(this).data('room-id'));
+                    selectAllAvailable(roomId);
+                });
 
-                if (isBooked) {
-                    slot.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200', 'cursor-pointer');
-                    slot.disabled = true;
-                    slot.onclick = () => showWaContact(bookingInfo);
-                } else if (selectedSlots.get(roomId)?.has(slot.dataset.time)) {
-                    slot.classList.add('bg-blue-600', 'text-white', 'ring-2', 'ring-blue-400');
-                    slot.onclick = () => toggleTimeSlot(slot);
-                } else {
-                    slot.classList.add('bg-gray-50', 'hover:bg-blue-50', 'text-gray-700', 'hover:text-blue-700',
-                                     'border', 'border-gray-200', 'hover:border-blue-300');
-                    slot.onclick = () => toggleTimeSlot(slot);
-                }
-            });
-        }
+                $(document).on('click', '.clear-selection-btn', function() {
+                    const roomId = parseInt($(this).data('room-id'));
+                    clearSelection(roomId);
+                });
 
-        function isTimeInRange(time, startTime, endTime) {
-            return time >= startTime && time < endTime;
-        }
+                // Modal buttons
+                $('#create-booking-btn').on('click', openBookingModal);
+                $('#close-modal-btn, #cancel-modal-btn').on('click', closeBookingModal);
+                $('#close-wa-modal').on('click', closeWaModal);
 
-        function toggleTimeSlot(button) {
-            const roomId = parseInt(button.dataset.roomId);
-            const time = button.dataset.time;
+                // Form submission with validation
+                $('#booking-form').on('submit', function(e) {
+                    const activity = $('#activity').val().trim();
 
-            if (!selectedSlots.has(roomId)) {
-                selectedSlots.set(roomId, new Set());
+                    if (!activity) {
+                        e.preventDefault();
+                        alert('Silakan isi deskripsi kegiatan');
+                        $('#activity').focus();
+                        return false;
+                    }
+
+                    // Show loading state
+                    $(this).find('button[type="submit"]')
+                        .prop('disabled', true)
+                        .html('<span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>Memproses...');
+                });
             }
 
-            const roomSlots = selectedSlots.get(roomId);
+            function filterRooms() {
+                const filterId = $('#room-filter').val();
+                $('.room-card').each(function() {
+                    if (filterId === '' || $(this).data('room-id') == filterId) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
 
-            if (roomSlots.has(time)) {
-                roomSlots.delete(time);
-            } else {
-                // Clear other room selections when selecting a new room
-                if (selectedSlots.size > 0) {
-                    for (const [otherRoomId, slots] of selectedSlots) {
-                        if (otherRoomId !== roomId && slots.size > 0) {
-                            if (!confirm('Anda sudah memilih slot di ruangan lain. Hapus pilihan sebelumnya?')) {
-                                return;
-                            }
-                            selectedSlots.clear();
-                            selectedSlots.set(roomId, new Set());
+            async function refreshSchedule() {
+                const date = $('#booking-date').val();
+                selectedSlots.clear();
+                updateFloatingAction();
+
+                // Get all room IDs
+                const roomIds = [];
+                $('.room-card').each(function() {
+                    roomIds.push($(this).data('room-id'));
+                });
+
+                // Fetch bookings for all rooms
+                for (const roomId of roomIds) {
+                    await fetchRoomBookings(roomId, date);
+                }
+            }
+
+            async function fetchRoomBookings(roomId, date) {
+                try {
+                    const response = await $.ajax({
+                        url: '{{ route("bookings.check-availability") }}',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: {
+                            room_id: roomId,
+                            date: date
+                        }
+                    });
+
+                    existingBookings.set(roomId, response.bookings || []);
+                    updateRoomSlots(roomId);
+                } catch (error) {
+                    console.error('Error fetching bookings:', error);
+                }
+            }
+
+            function updateRoomSlots(roomId) {
+                const bookings = existingBookings.get(roomId) || [];
+                const $container = $(`.time-slots-container[data-room-id="${roomId}"]`);
+
+                $container.find('.time-slot').each(function() {
+                    const $slot = $(this);
+                    const slotTime = $slot.data('time') + ':00';
+                    let isBooked = false;
+                    let bookingInfo = null;
+
+                    for (const booking of bookings) {
+                        if (isTimeInRange(slotTime, booking.start_time, booking.end_time)) {
+                            isBooked = true;
+                            bookingInfo = booking;
                             break;
                         }
                     }
-                }
-                roomSlots.add(time);
+
+                    // Reset classes and remove old data
+                    $slot.removeClass('booked selected bg-red-50 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
+                    $slot.removeAttr('data-booking');
+                    $slot.removeAttr('title');
+                    $slot.prop('disabled', false);
+
+                    if (isBooked) {
+                        // Style for booked slots
+                        $slot.addClass('booked bg-red-50 text-red-700 border-red-200 cursor-pointer hover:bg-red-100');
+
+                        // Store booking data properly
+                        $slot.attr('data-booking', JSON.stringify(bookingInfo));
+                        $slot.prop('disabled', false); // Enable click for WhatsApp contact
+
+                        // Add visual indicator and tooltip
+                        $slot.html($slot.data('time') + ' <span class="text-xs">📞</span>');
+                        $slot.attr('title', `Dipesan oleh: ${bookingInfo.user ? bookingInfo.user.name : 'Unknown'} - Klik untuk hubungi`);
+                    } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
+                        // Style for selected slots
+                        $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
+                        $slot.html($slot.data('time')); // Reset text
+                    } else {
+                        // Style for available slots
+                        $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
+                        $slot.html($slot.data('time')); // Reset text
+                    }
+                });
             }
 
-            updateRoomSlots(roomId);
-            updateFloatingAction();
-        }
+            function isTimeInRange(time, startTime, endTime) {
+                // A slot is considered booked if it falls within the booking time range
+                // We use >= for start and < for end to allow consecutive bookings
+                return time >= startTime && time < endTime;
+            }
 
-        function selectAllAvailable(roomId) {
-            const container = document.querySelector(`.time-slots-container[data-room-id="${roomId}"]`);
-            const bookings = existingBookings.get(roomId) || [];
-            const availableSlots = [];
+            function toggleTimeSlot($button) {
+                const roomId = parseInt($button.data('room-id'));
+                const time = $button.data('time');
 
-            container.querySelectorAll('.time-slot').forEach(slot => {
-                const slotTime = slot.dataset.time + ':00';
-                let isBooked = false;
+                if (!selectedSlots.has(roomId)) {
+                    selectedSlots.set(roomId, new Set());
+                }
 
-                for (const booking of bookings) {
-                    if (isTimeInRange(slotTime, booking.start_time, booking.end_time)) {
-                        isBooked = true;
+                const roomSlots = selectedSlots.get(roomId);
+
+                if (roomSlots.has(time)) {
+                    roomSlots.delete(time);
+                } else {
+                    // Clear other room selections
+                    if (selectedSlots.size > 0) {
+                        for (const [otherRoomId, slots] of selectedSlots) {
+                            if (otherRoomId !== roomId && slots.size > 0) {
+                                if (!confirm('Anda sudah memilih slot di ruangan lain. Hapus pilihan sebelumnya?')) {
+                                    return;
+                                }
+                                selectedSlots.clear();
+                                selectedSlots.set(roomId, new Set());
+                                break;
+                            }
+                        }
+                    }
+                    roomSlots.add(time);
+                }
+
+                updateRoomSlots(roomId);
+                updateFloatingAction();
+            }
+
+            function selectAllAvailable(roomId) {
+                const bookings = existingBookings.get(roomId) || [];
+                const availableSlots = [];
+
+                $(`.time-slots-container[data-room-id="${roomId}"] .time-slot`).each(function() {
+                    const slotTime = $(this).data('time') + ':00';
+                    let isBooked = false;
+
+                    for (const booking of bookings) {
+                        if (isTimeInRange(slotTime, booking.start_time, booking.end_time)) {
+                            isBooked = true;
+                            break;
+                        }
+                    }
+
+                    if (!isBooked) {
+                        availableSlots.push($(this).data('time'));
+                    }
+                });
+
+                if (availableSlots.length > 0) {
+                    selectedSlots.clear();
+                    selectedSlots.set(roomId, new Set(availableSlots));
+                    updateRoomSlots(roomId);
+                    updateFloatingAction();
+                }
+            }
+
+            function clearSelection(roomId) {
+                if (selectedSlots.has(roomId)) {
+                    selectedSlots.get(roomId).clear();
+                    updateRoomSlots(roomId);
+                    updateFloatingAction();
+                }
+            }
+
+            function updateFloatingAction() {
+                let totalSelected = 0;
+                for (const slots of selectedSlots.values()) {
+                    totalSelected += slots.size;
+                }
+
+                if (totalSelected > 0) {
+                    $('#selected-count').text(totalSelected);
+                    $('#floating-action').removeClass('hidden');
+                } else {
+                    $('#floating-action').addClass('hidden');
+                }
+            }
+
+            function openBookingModal() {
+                let selectedRoomId = null;
+                let selectedTimes = [];
+
+                for (const [roomId, slots] of selectedSlots) {
+                    if (slots.size > 0) {
+                        selectedRoomId = roomId;
+                        selectedTimes = Array.from(slots).sort();
                         break;
                     }
                 }
 
-                if (!isBooked) {
-                    availableSlots.push(slot.dataset.time);
+                if (!selectedRoomId || selectedTimes.length === 0) {
+                    alert('Pilih minimal satu slot waktu');
+                    return;
                 }
-            });
 
-            if (availableSlots.length > 0) {
-                selectedSlots.clear();
-                selectedSlots.set(roomId, new Set(availableSlots));
-                updateRoomSlots(roomId);
-                updateFloatingAction();
-            }
-        }
-
-        function clearSelection(roomId) {
-            if (selectedSlots.has(roomId)) {
-                selectedSlots.get(roomId).clear();
-                updateRoomSlots(roomId);
-                updateFloatingAction();
-            }
-        }
-
-        function updateFloatingAction() {
-            const floatingAction = document.getElementById('floating-action');
-            let totalSelected = 0;
-
-            for (const slots of selectedSlots.values()) {
-                totalSelected += slots.size;
-            }
-
-            if (totalSelected > 0) {
-                document.getElementById('selected-count').textContent = totalSelected;
-                floatingAction.classList.remove('hidden');
-            } else {
-                floatingAction.classList.add('hidden');
-            }
-        }
-
-        function openBookingModal() {
-            // Get selected room and slots
-            let selectedRoomId = null;
-            let selectedTimes = [];
-
-            for (const [roomId, slots] of selectedSlots) {
-                if (slots.size > 0) {
-                    selectedRoomId = roomId;
-                    selectedTimes = Array.from(slots).sort();
-                    break;
+                if (!checkConsecutive(selectedTimes)) {
+                    alert('Slot waktu yang dipilih harus berurutan');
+                    return;
                 }
+
+                const $roomCard = $(`.room-card[data-room-id="${selectedRoomId}"]`);
+                const roomName = $roomCard.find('h3').text();
+                const date = $('#booking-date').val();
+
+                const startTime = selectedTimes[0];
+                const endTimeHour = parseInt(selectedTimes[selectedTimes.length - 1].split(':')[0]);
+                const endTimeMin = parseInt(selectedTimes[selectedTimes.length - 1].split(':')[1]);
+                const endTime = `${String(endTimeMin === 30 ? endTimeHour + 1 : endTimeHour).padStart(2, '0')}:${endTimeMin === 30 ? '00' : '30'}`;
+
+                const duration = selectedTimes.length * 0.5;
+                const durationText = duration >= 1 ? `${duration} jam` : '30 menit';
+
+                $('#modal-room-id').val(selectedRoomId);
+                $('#modal-room-name').text(roomName);
+                $('#modal-booking-date').val(date);
+                $('#modal-date-display').text(formatDate(date));
+                $('#modal-start-time').val(startTime);
+                $('#modal-end-time').val(endTime);
+                $('#modal-time-display').text(`${startTime} - ${endTime}`);
+                $('#modal-duration').text(durationText);
+
+                $('#booking-modal').removeClass('hidden');
             }
 
-            if (!selectedRoomId || selectedTimes.length === 0) {
-                alert('Pilih minimal satu slot waktu');
-                return;
+            function closeBookingModal() {
+                $('#booking-modal').addClass('hidden');
+                $('#booking-form')[0].reset();
             }
 
-            // Check if slots are consecutive
-            const consecutive = checkConsecutive(selectedTimes);
-            if (!consecutive) {
-                alert('Slot waktu yang dipilih harus berurutan');
-                return;
-            }
+            function checkConsecutive(times) {
+                if (times.length === 1) return true;
 
-            // Get room info
-            const roomCard = document.querySelector(`.room-card[data-room-id="${selectedRoomId}"]`);
-            const roomName = roomCard.querySelector('h3').textContent;
-            const date = document.getElementById('booking-date').value;
-
-            // Calculate time range
-            const startTime = selectedTimes[0];
-            const endTimeHour = parseInt(selectedTimes[selectedTimes.length - 1].split(':')[0]);
-            const endTimeMin = parseInt(selectedTimes[selectedTimes.length - 1].split(':')[1]);
-            const endTime = `${String(endTimeMin === 30 ? endTimeHour + 1 : endTimeHour).padStart(2, '0')}:${endTimeMin === 30 ? '00' : '30'}`;
-
-            // Calculate duration
-            const duration = selectedTimes.length * 0.5;
-            const durationText = duration >= 1 ? `${duration} jam` : '30 menit';
-
-            // Fill modal data
-            document.getElementById('modal-room-id').value = selectedRoomId;
-            document.getElementById('modal-room-name').textContent = roomName;
-            document.getElementById('modal-booking-date').value = date;
-            document.getElementById('modal-date-display').textContent = formatDate(date);
-            document.getElementById('modal-start-time').value = startTime;
-            document.getElementById('modal-end-time').value = endTime;
-            document.getElementById('modal-time-display').textContent = `${startTime} - ${endTime}`;
-            document.getElementById('modal-duration').textContent = durationText;
-
-            // Show modal
-            document.getElementById('booking-modal').classList.remove('hidden');
-        }
-
-        function closeBookingModal() {
-            document.getElementById('booking-modal').classList.add('hidden');
-            document.getElementById('booking-form').reset();
-        }
-
-        function checkConsecutive(times) {
-            if (times.length === 1) return true;
-
-            for (let i = 1; i < times.length; i++) {
-                const prev = timeToMinutes(times[i - 1]);
-                const curr = timeToMinutes(times[i]);
-
-                if (curr - prev !== 30) {
-                    return false;
+                for (let i = 1; i < times.length; i++) {
+                    const prev = timeToMinutes(times[i - 1]);
+                    const curr = timeToMinutes(times[i]);
+                    if (curr - prev !== 30) {
+                        return false;
+                    }
                 }
-            }
-            return true;
-        }
-
-        function timeToMinutes(time) {
-            const [hour, minute] = time.split(':').map(Number);
-            return hour * 60 + minute;
-        }
-
-        function formatDate(dateString) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        }
-
-        function showWaContact(booking) {
-            if (!booking.user || !booking.user.whatsapp) {
-                alert('Informasi kontak tidak tersedia');
-                return;
+                return true;
             }
 
-            const roomName = document.querySelector(`.room-card h3`).textContent;
-            const date = document.getElementById('booking-date').value;
-            const userName = '{{ auth()->user()->name }}';
+            function timeToMinutes(time) {
+                const [hour, minute] = time.split(':').map(Number);
+                return hour * 60 + minute;
+            }
 
-            document.getElementById('wa-borrower-name').textContent = booking.user.name;
-            document.getElementById('wa-activity').textContent = booking.activity || 'Tidak ada keterangan';
+            function formatDate(dateString) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            }
 
-            const message = `Shalom saya ${userName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} di jam ${booking.start_time.substr(0, 5)} - ${booking.end_time.substr(0, 5)}.`;
-            const waNumber = booking.user.whatsapp.startsWith('0') ?
-                            '62' + booking.user.whatsapp.substr(1) :
-                            booking.user.whatsapp;
-            const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+            function showWaContact(booking, roomName) {
+                console.log('Booking data:', booking); // Debug
 
-            document.getElementById('wa-link').href = waLink;
-            document.getElementById('wa-modal').classList.remove('hidden');
-        }
+                // Check if user data exists
+                if (!booking.user) {
+                    alert('Informasi peminjam tidak tersedia');
+                    return;
+                }
 
-        function closeWaModal() {
-            document.getElementById('wa-modal').classList.add('hidden');
-        }
+                // Get current user name
+                const userName = '{{ auth()->user()->name }}';
+                const bookingDate = $('#booking-date').val();
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initializePage);
+                // Update modal content
+                $('#wa-borrower-name').text(booking.user.name || 'Tidak diketahui');
+                $('#wa-activity').text(booking.activity || 'Tidak ada keterangan');
+
+                // Format time
+                const startTime = booking.start_time ? booking.start_time.substr(0, 5) : '';
+                const endTime = booking.end_time ? booking.end_time.substr(0, 5) : '';
+
+                // Check if WhatsApp number exists
+                if (booking.user.whatsapp) {
+                    // Format message
+                    const message = `Shalom saya ${userName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada tanggal ${formatDate(bookingDate)} di jam ${startTime} - ${endTime}.`;
+
+                    // Format WhatsApp number (Indonesian format)
+                    let waNumber = booking.user.whatsapp;
+                    if (waNumber.startsWith('0')) {
+                        waNumber = '62' + waNumber.substr(1);
+                    }
+
+                    const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+                    $('#wa-link').attr('href', waLink);
+                    $('#wa-link').removeClass('hidden');
+                    $('#no-wa-message').addClass('hidden');
+                } else {
+                    // No WhatsApp number available
+                    $('#wa-link').addClass('hidden');
+                    $('#no-wa-message').removeClass('hidden');
+                }
+
+                // Show modal
+                $('#wa-modal').removeClass('hidden');
+            }
+
+            function closeWaModal() {
+                $('#wa-modal').addClass('hidden');
+            }
+        });
     </script>
     @endpush
 </x-app-layout>
