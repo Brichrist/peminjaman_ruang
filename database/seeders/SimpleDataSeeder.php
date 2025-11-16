@@ -22,37 +22,20 @@ class SimpleDataSeeder extends Seeder
         User::truncate();
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Create 3 users (1 admin, 2 regular users)
-        $this->command->info('Creating users...');
+        // Create admin user
+        $this->command->info('Creating admin user...');
 
         $admin = User::create([
             'name' => 'Administrator',
-            'email' => 'admin@nicc.com',
+            'email' => 'diasporamalang18@gmail.com',
             'whatsapp' => '081234567890',
             'password' => Hash::make('password'),
             'is_admin' => true,
             'email_verified_at' => now(),
         ]);
 
-        $user1 = User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'budi@gmail.com',
-            'whatsapp' => '087654321098',
-            'password' => Hash::make('password'),
-            'is_admin' => false,
-            'email_verified_at' => now(),
-        ]);
 
-        $user2 = User::create([
-            'name' => 'Sarah Wijaya',
-            'email' => 'sarah@gmail.com',
-            'whatsapp' => '089876543210',
-            'password' => Hash::make('password'),
-            'is_admin' => false,
-            'email_verified_at' => now(),
-        ]);
-
-        // Create 11 rooms
+        // Create 10 rooms
         $this->command->info('Creating rooms...');
 
         $rooms = [
@@ -63,9 +46,9 @@ class SimpleDataSeeder extends Seeder
                 'status' => 'available'
             ],
             [
-                'name' => 'HALL RUANG 3M',
-                'description' => 'Hall ruang 3M untuk kegiatan umum, cocok untuk acara menengah.',
-                'capacity' => 50,
+                'name' => 'HALL RUANG SM',
+                'description' => 'Hall untuk kegiatan Sekolah Minggu dengan dekorasi dan fasilitas khusus anak.',
+                'capacity' => 80,
                 'status' => 'available'
             ],
             [
@@ -115,12 +98,6 @@ class SimpleDataSeeder extends Seeder
                 'description' => 'Auditorium besar untuk acara-acara khusus dengan panggung dan sound system profesional.',
                 'capacity' => 300,
                 'status' => 'available'
-            ],
-            [
-                'name' => 'HALL RUANG SM',
-                'description' => 'Hall untuk kegiatan Sekolah Minggu dengan dekorasi dan fasilitas khusus anak.',
-                'capacity' => 80,
-                'status' => 'available'
             ]
         ];
 
@@ -128,10 +105,8 @@ class SimpleDataSeeder extends Seeder
             Room::create($roomData);
         }
 
-        // Create some sample bookings for demonstration
+        // Data seeding completed
         $this->command->info('Data seeding completed successfully!');
-        $this->command->info('Admin: admin@nicc.com / password');
-        $this->command->info('User 1: budi@gmail.com / password');
-        $this->command->info('User 2: sarah@gmail.com / password');
+        $this->command->info('Admin: diasporamalang18@gmail.com / password');
     }
 }
