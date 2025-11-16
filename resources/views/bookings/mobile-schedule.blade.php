@@ -34,14 +34,23 @@
                     </select>
                 </div>
 
-                <!-- Action Button -->
-                <button id="refresh-btn"
-                        class="w-full py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    Refresh Jadwal
-                </button>
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="filter-time-btn"
+                            class="py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Filter Jam
+                    </button>
+                    <button id="refresh-btn"
+                            class="py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -165,6 +174,35 @@
                         </div>
                     </div>
 
+                    <!-- Guest Info -->
+                    <div>
+                        <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nama Lengkap <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="guest_name"
+                            id="guest_name"
+                            required
+                            placeholder="Masukkan nama lengkap"
+                            class="w-full text-sm rounded-lg border-gray-300 shadow-sm">
+                    </div>
+
+                    <div>
+                        <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nomor Telepon/WhatsApp <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="guest_phone"
+                            id="guest_phone"
+                            required
+                            placeholder="08xx atau 628xx"
+                            pattern="^(0|62)[0-9]{9,13}$"
+                            class="w-full text-sm rounded-lg border-gray-300 shadow-sm">
+                        <p class="text-xs text-gray-500 mt-1">Format: 08xxxxxxxxx atau 628xxxxxxxxx</p>
+                    </div>
+
                     <!-- Activity Field -->
                     <div>
                         <label for="activity" class="block text-sm font-medium text-gray-700 mb-1">
@@ -179,14 +217,6 @@
                             class="w-full text-sm rounded-lg border-gray-300 shadow-sm"></textarea>
                     </div>
 
-                    <!-- Contact Confirmation -->
-                    <label class="flex items-start gap-2">
-                        <input type="checkbox" name="confirm_contact" class="mt-0.5 rounded border-gray-300 text-blue-600">
-                        <span class="text-xs text-gray-600">
-                            Saya bersedia dihubungi via WhatsApp ({{ auth()?->user()?->whatsapp??'null' }})
-                        </span>
-                    </label>
-
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 gap-2 pt-2">
                         <button type="button" id="cancel-modal-btn"
@@ -199,6 +229,57 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Filter Modal -->
+    <div id="time-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-end sm:items-center justify-center">
+        <div class="bg-white rounded-t-2xl sm:rounded-xl w-full sm:max-w-sm">
+            <div class="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between rounded-t-2xl sm:rounded-t-xl">
+                <h3 class="text-lg font-semibold text-gray-900">Filter Jam</h3>
+                <button id="close-time-filter-btn" class="p-1 hover:bg-gray-100 rounded-lg">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-4 space-y-4">
+                <p class="text-sm text-gray-600">Pilih range jam yang ingin ditampilkan:</p>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dari Jam:</label>
+                    <select id="filter-start-time" class="w-full text-sm rounded-lg border-gray-300 shadow-sm">
+                        @for($h = 5; $h <= 22; $h++)
+                            <option value="{{ sprintf('%02d:00', $h) }}">{{ sprintf('%02d:00', $h) }}</option>
+                            <option value="{{ sprintf('%02d:30', $h) }}">{{ sprintf('%02d:30', $h) }}</option>
+                        @endfor
+                        <option value="23:00">23:00</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sampai Jam:</label>
+                    <select id="filter-end-time" class="w-full text-sm rounded-lg border-gray-300 shadow-sm">
+                        @for($h = 5; $h <= 22; $h++)
+                            <option value="{{ sprintf('%02d:00', $h) }}">{{ sprintf('%02d:00', $h) }}</option>
+                            <option value="{{ sprintf('%02d:30', $h) }}">{{ sprintf('%02d:30', $h) }}</option>
+                        @endfor
+                        <option value="23:00" selected>23:00</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button id="reset-time-filter-btn"
+                            class="py-2.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium">
+                        Reset Filter
+                    </button>
+                    <button id="apply-time-filter-btn"
+                            class="py-2.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition font-medium">
+                        Terapkan
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -251,6 +332,7 @@
         $(document).ready(function() {
             let selectedSlots = new Map();
             let existingBookings = new Map();
+            let timeFilter = { start: null, end: null };
 
             initializePage();
 
@@ -297,6 +379,12 @@
                 $('#create-booking-btn').on('click', openBookingModal);
                 $('#close-modal-btn, #cancel-modal-btn').on('click', closeBookingModal);
                 $('#close-wa-modal').on('click', closeWaModal);
+
+                // Time filter controls
+                $('#filter-time-btn').on('click', openTimeFilterModal);
+                $('#close-time-filter-btn').on('click', closeTimeFilterModal);
+                $('#reset-time-filter-btn').on('click', resetTimeFilter);
+                $('#apply-time-filter-btn').on('click', applyTimeFilter);
 
                 // Form submission
                 $('#booking-form').on('submit', function(e) {
@@ -374,13 +462,25 @@
                         $slot.addClass('booked bg-red-100 text-red-700 border-red-200');
                         $slot.attr('data-booking', JSON.stringify(bookingInfo));
                         $slot.html($slot.data('time') + ' 📞');
-                        $slot.attr('title', `${bookingInfo.user?.name || 'Unknown'}`);
+                        $slot.attr('title', `${bookingInfo.contact_name || 'Unknown'}`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
                         $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
                         $slot.html($slot.data('time'));
                     } else {
                         $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700');
                         $slot.html($slot.data('time'));
+                    }
+
+                    // Apply time filter
+                    if (timeFilter.start || timeFilter.end) {
+                        const slotTime = $slot.data('time');
+                        if (timeFilter.start && slotTime < timeFilter.start) {
+                            $slot.hide();
+                        } else if (timeFilter.end && slotTime >= timeFilter.end) {
+                            $slot.hide();
+                        } else {
+                            $slot.show();
+                        }
                     }
                 });
             }
@@ -546,24 +646,17 @@
             }
 
             function showWaContact(booking, roomName) {
-                if (!booking.user) {
-                    alert('Info peminjam tidak tersedia');
-                    return;
-                }
-
-                const userName = '{{ auth()->user()->name }}';
                 const bookingDate = $('#booking-date').val();
 
-                $('#wa-borrower-name').text(booking.user.name || 'Tidak diketahui');
+                $('#wa-borrower-name').text(booking.contact_name || 'Tidak diketahui');
                 $('#wa-activity').text(booking.activity || 'Tidak ada keterangan');
 
                 const startTime = booking.start_time?.substr(0, 5) || '';
                 const endTime = booking.end_time?.substr(0, 5) || '';
 
-                if (booking.user.whatsapp) {
-                    const message = `Shalom saya ${userName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada ${formatDate(bookingDate)} di jam ${startTime}-${endTime}.`;
-                    let waNumber = booking.user.whatsapp;
-                    if (waNumber.startsWith('0')) waNumber = '62' + waNumber.substr(1);
+                if (booking.contact_phone) {
+                    const message = `Shalom, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada ${formatDate(bookingDate)} di jam ${startTime}-${endTime}.`;
+                    const waNumber = booking.contact_phone;
                     $('#wa-link').attr('href', `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`);
                     $('#wa-link').removeClass('hidden');
                     $('#no-wa-message').addClass('hidden');
@@ -574,6 +667,49 @@
 
                 $('#wa-modal').removeClass('hidden');
                 $('body').addClass('overflow-hidden');
+            }
+
+            function openTimeFilterModal() {
+                $('#time-filter-modal').removeClass('hidden');
+                $('body').addClass('overflow-hidden');
+            }
+
+            function closeTimeFilterModal() {
+                $('#time-filter-modal').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
+            }
+
+            function applyTimeFilter() {
+                const startTime = $('#filter-start-time').val();
+                const endTime = $('#filter-end-time').val();
+
+                if (startTime >= endTime) {
+                    alert('Jam mulai harus lebih kecil dari jam selesai');
+                    return;
+                }
+
+                timeFilter.start = startTime;
+                timeFilter.end = endTime;
+
+                // Update all room slots
+                $('.room-card').each(function() {
+                    const roomId = $(this).data('room-id');
+                    updateRoomSlots(roomId);
+                });
+
+                closeTimeFilterModal();
+            }
+
+            function resetTimeFilter() {
+                timeFilter.start = null;
+                timeFilter.end = null;
+                $('#filter-start-time').val('05:00');
+                $('#filter-end-time').val('23:00');
+
+                // Show all slots
+                $('.time-slot').show();
+
+                closeTimeFilterModal();
             }
 
             function closeWaModal() {

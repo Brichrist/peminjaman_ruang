@@ -29,7 +29,14 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="flex items-end">
+                    <div class="flex items-end gap-2">
+                        <button id="filter-time-btn"
+                                class="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Filter Jam
+                        </button>
                         <button id="refresh-btn"
                                 class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,11 +295,74 @@
         </div>
     </div>
 
+    <!-- Time Filter Modal -->
+    <div id="time-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full shadow-2xl">
+            <div class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
+                <h3 class="text-xl font-semibold flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Filter Waktu
+                </h3>
+            </div>
+
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Pilih rentang waktu yang ingin ditampilkan</p>
+
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label for="filter-start-time" class="block text-sm font-medium text-gray-700 mb-2">
+                            Dari Jam
+                        </label>
+                        <select id="filter-start-time" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                            <option value="">Pilih jam mulai</option>
+                            @php
+                                $filterSlots = [];
+                                for ($hour = 5; $hour < 23; $hour++) {
+                                    $filterSlots[] = sprintf('%02d:00', $hour);
+                                    $filterSlots[] = sprintf('%02d:30', $hour);
+                                }
+                            @endphp
+                            @foreach($filterSlots as $slot)
+                                <option value="{{ $slot }}">{{ $slot }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="filter-end-time" class="block text-sm font-medium text-gray-700 mb-2">
+                            Sampai Jam
+                        </label>
+                        <select id="filter-end-time" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                            <option value="">Pilih jam selesai</option>
+                            @foreach($filterSlots as $slot)
+                                <option value="{{ $slot }}">{{ $slot }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="reset-time-filter"
+                            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                        Reset Filter
+                    </button>
+                    <button id="apply-time-filter"
+                            class="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
+                        Terapkan Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
         $(document).ready(function() {
             let selectedSlots = new Map();
             let existingBookings = new Map();
+            let timeFilter = { start: null, end: null };
 
             // Initialize page
             initializePage();
@@ -305,6 +375,9 @@
                 $('#booking-date').on('change', refreshSchedule);
                 $('#room-filter').on('change', filterRooms);
                 $('#refresh-btn').on('click', refreshSchedule);
+                $('#filter-time-btn').on('click', openTimeFilterModal);
+                $('#apply-time-filter').on('click', applyTimeFilter);
+                $('#reset-time-filter').on('click', resetTimeFilter);
 
                 // Time slot selection using event delegation
                 $(document).on('click', '.time-slot:not(.booked)', function(e) {
@@ -428,6 +501,22 @@
                     const slotTime = $slot.data('time') + ':00';
                     let isBooked = false;
                     let bookingInfo = null;
+
+                    // Check if slot should be filtered out
+                    const slotTimeOnly = $slot.data('time');
+                    if (timeFilter.start || timeFilter.end) {
+                        const slotMinutes = timeToMinutes(slotTimeOnly);
+                        const startMinutes = timeFilter.start ? timeToMinutes(timeFilter.start) : 0;
+                        const endMinutes = timeFilter.end ? timeToMinutes(timeFilter.end) : 24 * 60;
+
+                        if (slotMinutes < startMinutes || slotMinutes >= endMinutes) {
+                            $slot.hide();
+                            return; // Skip this slot
+                        }
+                    }
+
+                    // Show slot if not filtered
+                    $slot.show();
 
                     for (const booking of bookings) {
                         if (isTimeInRange(slotTime, booking.start_time, booking.end_time)) {
@@ -672,6 +761,73 @@
 
             function closeWaModal() {
                 $('#wa-modal').addClass('hidden');
+            }
+
+            function openTimeFilterModal() {
+                // Set current filter values if any
+                if (timeFilter.start) {
+                    $('#filter-start-time').val(timeFilter.start);
+                }
+                if (timeFilter.end) {
+                    $('#filter-end-time').val(timeFilter.end);
+                }
+                $('#time-filter-modal').removeClass('hidden');
+            }
+
+            function applyTimeFilter() {
+                const startTime = $('#filter-start-time').val();
+                const endTime = $('#filter-end-time').val();
+
+                // Validate that end time is after start time if both selected
+                if (startTime && endTime) {
+                    const startMinutes = timeToMinutes(startTime);
+                    const endMinutes = timeToMinutes(endTime);
+
+                    if (endMinutes <= startMinutes) {
+                        alert('Jam selesai harus lebih besar dari jam mulai');
+                        return;
+                    }
+                }
+
+                // Update filter state
+                timeFilter.start = startTime || null;
+                timeFilter.end = endTime || null;
+
+                // Close modal
+                $('#time-filter-modal').addClass('hidden');
+
+                // Re-render all room slots with filter applied
+                const roomIds = [];
+                $('.room-card').each(function() {
+                    roomIds.push($(this).data('room-id'));
+                });
+
+                roomIds.forEach(roomId => {
+                    updateRoomSlots(roomId);
+                });
+            }
+
+            function resetTimeFilter() {
+                // Reset filter state
+                timeFilter.start = null;
+                timeFilter.end = null;
+
+                // Reset form
+                $('#filter-start-time').val('');
+                $('#filter-end-time').val('');
+
+                // Close modal
+                $('#time-filter-modal').addClass('hidden');
+
+                // Re-render all room slots without filter
+                const roomIds = [];
+                $('.room-card').each(function() {
+                    roomIds.push($(this).data('room-id'));
+                });
+
+                roomIds.forEach(roomId => {
+                    updateRoomSlots(roomId);
+                });
             }
         });
     </script>
