@@ -9,24 +9,6 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    public function index()
-    {
-        $bookings = Booking::with(['room', 'user'])
-            ->when(!auth()->user()->isAdmin(), function ($query) {
-                return $query->where('user_id', auth()->id());
-            })
-            ->orderBy('booking_date', 'desc')
-            ->orderBy('start_time', 'desc')
-            ->paginate(10);
-
-        return view('bookings.index', compact('bookings'));
-    }
-
     public function create()
     {
         $rooms = Room::where('status', 'available')->get();
@@ -42,7 +24,9 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'activity' => 'required|string|max:500'
+            'activity' => 'required|string|max:500',
+            'guest_name' => 'required|string|max:255',
+            'guest_phone' => ['required', 'string', 'regex:/^(0|62)[0-9]{9,13}$/']
         ]);
 
         // Check if the time slot is available
@@ -55,50 +39,20 @@ class BookingController extends Controller
             return back()->withErrors(['time' => 'Slot waktu yang dipilih tidak tersedia.'])->withInput();
         }
 
-        // Create booking (auto-approved)
+        // Create booking (auto-approved) with guest info
         $booking = Booking::create([
-            'user_id' => auth()->id(),
             'room_id' => $validated['room_id'],
             'booking_date' => $validated['booking_date'],
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
             'activity' => $validated['activity'],
+            'guest_name' => $validated['guest_name'],
+            'guest_phone' => $validated['guest_phone'],
             'status' => 'approved'
         ]);
 
         return redirect()->route('bookings.room-schedule')
             ->with('success', 'Peminjaman ruangan berhasil dibuat dan langsung disetujui.');
-    }
-
-    public function show(Booking $booking)
-    {
-        // Check authorization
-        if (!auth()->user()->isAdmin() && $booking->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        return view('bookings.show', compact('booking'));
-    }
-
-    public function destroy(Booking $booking)
-    {
-        // Only allow cancellation of own bookings or admin can cancel any
-        if (!auth()->user()->isAdmin() && $booking->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        if (!$booking->canBeCancelled()) {
-            return back()->with('error', 'Peminjaman ini tidak dapat dibatalkan.');
-        }
-
-        $booking->update([
-            'status' => 'cancelled',
-            'cancelled_by' => auth()->user()->name,
-            'cancellation_reason' => request('reason', 'Dibatalkan oleh pengguna')
-        ]);
-
-        return redirect()->route('bookings.index')
-            ->with('success', 'Peminjaman berhasil dibatalkan.');
     }
 
     public function schedule(Request $request)
@@ -130,12 +84,21 @@ class BookingController extends Controller
             'date' => 'required|date|after_or_equal:today'
         ]);
 
-        $bookings = Booking::with('user:id,name,whatsapp')
-            ->where('room_id', $request->room_id)
+        $bookings = Booking::where('room_id', $request->room_id)
             ->where('booking_date', $request->date)
             ->where('status', 'approved')
-            ->select('id', 'user_id', 'start_time', 'end_time', 'activity')
-            ->get();
+            ->select('id', 'user_id', 'guest_name', 'guest_phone', 'start_time', 'end_time', 'activity')
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'id' => $booking->id,
+                    'start_time' => $booking->start_time,
+                    'end_time' => $booking->end_time,
+                    'activity' => $booking->activity,
+                    'contact_name' => $booking->getContactName(),
+                    'contact_phone' => $booking->getFormattedWhatsApp()
+                ];
+            });
 
         return response()->json(['bookings' => $bookings]);
     }

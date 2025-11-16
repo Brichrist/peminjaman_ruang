@@ -11,7 +11,10 @@
       "Bash(touch:*)",
       "Bash(cmd /c:*)",
       "Bash(powershell:*)",
-      "Bash(php artisan migrate:*)"
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan:*)",
+      "Bash(nul)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

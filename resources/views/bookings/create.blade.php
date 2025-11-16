@@ -137,6 +137,56 @@
                             </div>
                         </div>
 
+                        <!-- Guest Information -->
+                        <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 border border-pink-100">
+                            <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                Informasi Peminjam
+                            </h3>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Nama Lengkap <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="guest_name" id="guest_name" value="{{ old('guest_name') }}"
+                                           class="w-full px-4 py-3 rounded-lg border-2 border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                                           placeholder="Masukkan nama lengkap Anda"
+                                           required>
+                                    @error('guest_name')
+                                        <p class="mt-2 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Nomor Telepon/WhatsApp <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="guest_phone" id="guest_phone" value="{{ old('guest_phone') }}"
+                                           class="w-full px-4 py-3 rounded-lg border-2 border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                                           placeholder="08xx atau 628xx"
+                                           pattern="^(0|62)[0-9]{9,13}$"
+                                           required>
+                                    <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxx atau 628xxxxxxxxx</p>
+                                    @error('guest_phone')
+                                        <p class="mt-2 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Activity Details -->
                         <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-100">
                             <label for="activity" class="block text-sm font-semibold text-gray-800 mb-3">
@@ -185,7 +235,7 @@
 
                         <!-- Submit Buttons -->
                         <div class="flex justify-between items-center pt-6 border-t border-gray-200">
-                            <a href="{{ route('bookings.index') }}" class="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200">
+                            <a href="{{ route('bookings.room-schedule') }}" class="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -230,30 +280,27 @@
                         const availabilityInfo = document.getElementById('availability-info');
                         const bookedSlots = document.getElementById('booked-slots');
 
-                        if (data.length > 0) {
+                        if (data.bookings && data.bookings.length > 0) {
                             availabilityInfo.classList.remove('hidden');
-                            bookedSlots.innerHTML = data.map(booking => {
-                                const userName = '{{ auth()->user()->name }}';
+                            bookedSlots.innerHTML = data.bookings.map(booking => {
+                                const guestName = document.getElementById('guest_name').value || 'Saya';
                                 const roomName = roomSelect.options[roomSelect.selectedIndex].text.split(' (')[0];
                                 const startTime = booking.start_time.substr(0, 5);
                                 const endTime = booking.end_time.substr(0, 5);
 
                                 // Format WhatsApp message
-                                let waMessage = `Shalom saya ${userName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} di jam ${startTime} - ${endTime}.`;
+                                let waMessage = `Shalom saya ${guestName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} di jam ${startTime} - ${endTime}.`;
                                 waMessage = encodeURIComponent(waMessage);
 
-                                // Format phone number (remove leading 0 and add 62 for Indonesia)
-                                let waNumber = booking.user.whatsapp;
-                                if (waNumber && waNumber.startsWith('0')) {
-                                    waNumber = '62' + waNumber.substr(1);
-                                }
+                                // Use formatted phone number from API
+                                let waNumber = booking.contact_phone;
 
                                 return `<div class="bg-red-50 border border-red-200 rounded-lg p-3">
                                     <div class="flex justify-between items-center">
                                         <div>
                                             <span class="font-semibold text-red-800">${startTime} - ${endTime}</span>
                                             <div class="text-sm text-gray-600 mt-1">
-                                                <div>Peminjam: ${booking.user.name}</div>
+                                                <div>Peminjam: ${booking.contact_name}</div>
                                                 <div>Kegiatan: ${booking.activity}</div>
                                             </div>
                                         </div>

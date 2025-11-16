@@ -13,7 +13,7 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!auth()->check() || !auth()->user()->isAdmin()) {
+            if (!auth()->check() || !auth()->user()?->isAdmin()) {
                 return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
             }
             return $next($request);
@@ -138,19 +138,19 @@ class AdminController extends Controller
 
         $roomUsage = Room::withCount(['bookings' => function ($query) use ($startDate, $endDate) {
             $query->whereBetween('booking_date', [$startDate, $endDate])
-                  ->where('status', 'approved');
+                ->where('status', 'approved');
         }])
-        ->orderBy('bookings_count', 'desc')
-        ->get();
+            ->orderBy('bookings_count', 'desc')
+            ->get();
 
         $topUsers = User::withCount(['bookings' => function ($query) use ($startDate, $endDate) {
             $query->whereBetween('booking_date', [$startDate, $endDate])
-                  ->where('status', 'approved');
+                ->where('status', 'approved');
         }])
-        ->where('is_admin', false)
-        ->orderBy('bookings_count', 'desc')
-        ->limit(10)
-        ->get();
+            ->where('is_admin', false)
+            ->orderBy('bookings_count', 'desc')
+            ->limit(10)
+            ->get();
 
         return view('admin.reports', compact(
             'bookingStats',

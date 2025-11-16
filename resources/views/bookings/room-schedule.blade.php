@@ -70,8 +70,8 @@
                         <div class="grid grid-cols-4 gap-2 time-slots-container" data-room-id="{{ $room->id }}">
                             @php
                                 $timeSlots = [];
-                                $startHour = 8;
-                                $endHour = 20;
+                                $startHour = 5;
+                                $endHour = 23;
 
                                 for ($hour = $startHour; $hour < $endHour; $hour++) {
                                     $timeSlots[] = sprintf('%02d:00', $hour);
@@ -152,6 +152,35 @@
                     </div>
                 </div>
 
+                <!-- Guest Information -->
+                <div class="mb-6">
+                    <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nama Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="guest_name"
+                        id="guest_name"
+                        required
+                        placeholder="Masukkan nama lengkap Anda"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div class="mb-6">
+                    <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nomor Telepon/WhatsApp <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="guest_phone"
+                        id="guest_phone"
+                        required
+                        placeholder="08xx atau 628xx"
+                        pattern="^(0|62)[0-9]{9,13}$"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxx atau 628xxxxxxxxx</p>
+                </div>
+
                 <!-- Activity Field -->
                 <div class="mb-6">
                     <label for="activity" class="block text-sm font-medium text-gray-700 mb-2">
@@ -164,31 +193,6 @@
                         required
                         placeholder="Deskripsikan kegiatan yang akan dilakukan..."
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
-                </div>
-
-                <!-- Participant Count (Optional) -->
-                <div class="mb-6">
-                    <label for="participant_count" class="block text-sm font-medium text-gray-700 mb-2">
-                        Estimasi Peserta
-                    </label>
-                    <input
-                        type="number"
-                        name="participant_count"
-                        id="participant_count"
-                        min="1"
-                        placeholder="Jumlah peserta (opsional)"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-
-                <!-- Contact Confirmation -->
-                <div class="mb-6">
-                    <label class="flex items-start gap-3">
-                        <input type="checkbox" name="confirm_contact" class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600">
-                            Saya bersedia dihubungi melalui WhatsApp ({{ auth()->user()->whatsapp }})
-                            jika ada yang perlu konfirmasi terkait peminjaman ini.
-                        </span>
-                    </label>
                 </div>
 
                 <!-- Action Buttons -->
@@ -419,14 +423,14 @@
                     }
 
                     // Reset classes and remove old data
-                    $slot.removeClass('booked selected bg-red-50 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
+                    $slot.removeClass('booked selected bg-red-100 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
                     $slot.removeAttr('data-booking');
                     $slot.removeAttr('title');
                     $slot.prop('disabled', false);
 
                     if (isBooked) {
                         // Style for booked slots
-                        $slot.addClass('booked bg-red-50 text-red-700 border-red-200 cursor-pointer hover:bg-red-100');
+                        $slot.addClass('booked bg-red-100 text-red-700 border-red-200 cursor-pointer hover:bg-red-100');
 
                         // Store booking data properly
                         $slot.attr('data-booking', JSON.stringify(bookingInfo));
@@ -434,7 +438,7 @@
 
                         // Add visual indicator and tooltip
                         $slot.html($slot.data('time') + ' <span class="text-xs">📞</span>');
-                        $slot.attr('title', `Dipesan oleh: ${bookingInfo.user ? bookingInfo.user.name : 'Unknown'} - Klik untuk hubungi`);
+                        $slot.attr('title', `Dipesan oleh: ${bookingInfo.contact_name || 'Unknown'} - Klik untuk hubungi`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
                         // Style for selected slots
                         $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
@@ -613,18 +617,10 @@
             function showWaContact(booking, roomName) {
                 console.log('Booking data:', booking); // Debug
 
-                // Check if user data exists
-                if (!booking.user) {
-                    alert('Informasi peminjam tidak tersedia');
-                    return;
-                }
-
-                // Get current user name
-                const userName = '{{ auth()->user()->name }}';
                 const bookingDate = $('#booking-date').val();
 
                 // Update modal content
-                $('#wa-borrower-name').text(booking.user.name || 'Tidak diketahui');
+                $('#wa-borrower-name').text(booking.contact_name || 'Tidak diketahui');
                 $('#wa-activity').text(booking.activity || 'Tidak ada keterangan');
 
                 // Format time
@@ -632,16 +628,12 @@
                 const endTime = booking.end_time ? booking.end_time.substr(0, 5) : '';
 
                 // Check if WhatsApp number exists
-                if (booking.user.whatsapp) {
-                    // Format message
-                    const message = `Shalom saya ${userName}, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada tanggal ${formatDate(bookingDate)} di jam ${startTime} - ${endTime}.`;
+                if (booking.contact_phone) {
+                    // Format message (without sender name since public access)
+                    const message = `Shalom, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada tanggal ${formatDate(bookingDate)} di jam ${startTime} - ${endTime}.`;
 
-                    // Format WhatsApp number (Indonesian format)
-                    let waNumber = booking.user.whatsapp;
-                    if (waNumber.startsWith('0')) {
-                        waNumber = '62' + waNumber.substr(1);
-                    }
-
+                    // Use already formatted WhatsApp number from API
+                    const waNumber = booking.contact_phone;
                     const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
 
                     $('#wa-link').attr('href', waLink);

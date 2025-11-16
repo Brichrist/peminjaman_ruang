@@ -16,9 +16,7 @@
 
         <!-- Quick Stats -->
         @php
-            $todayBookings = App\Models\Booking::where('booking_date', today())
-                ->where('status', 'approved')
-                ->count();
+            $todayBookings = App\Models\Booking::where('booking_date', today())->where('status', 'approved')->count();
             $myBookings = App\Models\Booking::where('user_id', auth()->id())
                 ->where('booking_date', '>=', today())
                 ->where('status', 'approved')
@@ -78,8 +76,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Booking & Schedule -->
-                <a href="{{ route('bookings.room-schedule') }}"
-                   class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                <a href="{{ route('bookings.room-schedule') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="relative p-6">
                         <div class="w-14 h-14 bg-blue-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
@@ -96,28 +93,26 @@
                     </div>
                 </a>
 
-                <!-- My Bookings -->
-                <a href="{{ route('bookings.index') }}"
-                   class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                <!-- Schedule View -->
+                <a href="{{ route('bookings.schedule') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                     <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="relative p-6">
                         <div class="w-14 h-14 bg-purple-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
                             <svg class="w-8 h-8 text-purple-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 group-hover:text-white mb-2 transition-colors duration-300">
-                            Riwayat Saya
+                            Jadwal Ruangan
                         </h3>
                         <p class="text-sm text-gray-600 group-hover:text-white/90 transition-colors duration-300">
-                            Lihat dan kelola peminjaman ruangan Anda
+                            Lihat jadwal peminjaman semua ruangan
                         </p>
                     </div>
                 </a>
 
                 <!-- Profile Settings -->
-                <a href="{{ route('profile.edit') }}"
-                   class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                <a href="{{ route('profile.edit') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                     <div class="absolute inset-0 bg-gradient-to-br from-gray-600 to-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="relative p-6">
                         <div class="w-14 h-14 bg-gray-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
@@ -134,10 +129,9 @@
                     </div>
                 </a>
 
-                @if(auth()->user()->isAdmin())
+                @if (auth()->user()?->isAdmin() ?? null)
                     <!-- Admin Dashboard -->
-                    <a href="{{ route('admin.dashboard') }}"
-                       class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                    <a href="{{ route('admin.dashboard') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                         <div class="absolute inset-0 bg-gradient-to-br from-red-600 to-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div class="relative p-6">
                             <div class="w-14 h-14 bg-red-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
@@ -156,8 +150,7 @@
                     </a>
 
                     <!-- Room Management -->
-                    <a href="{{ route('rooms.index') }}"
-                       class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                    <a href="{{ route('rooms.index') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                         <div class="absolute inset-0 bg-gradient-to-br from-yellow-600 to-yellow-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div class="relative p-6">
                             <div class="w-14 h-14 bg-yellow-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
@@ -175,8 +168,7 @@
                     </a>
 
                     <!-- User Management -->
-                    <a href="{{ route('admin.users') }}"
-                       class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                    <a href="{{ route('admin.users') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div class="relative p-6">
                             <div class="w-14 h-14 bg-indigo-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">

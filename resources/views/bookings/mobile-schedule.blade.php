@@ -77,8 +77,8 @@
                     <div class="grid grid-cols-4 gap-1.5 time-slots-container" data-room-id="{{ $room->id }}">
                         @php
                             $timeSlots = [];
-                            $startHour = 8;
-                            $endHour = 20;
+                            $startHour = 5;
+                            $endHour = 23;
 
                             for ($hour = $startHour; $hour < $endHour; $hour++) {
                                 $timeSlots[] = sprintf('%02d:00', $hour);
@@ -183,7 +183,7 @@
                     <label class="flex items-start gap-2">
                         <input type="checkbox" name="confirm_contact" class="mt-0.5 rounded border-gray-300 text-blue-600">
                         <span class="text-xs text-gray-600">
-                            Saya bersedia dihubungi via WhatsApp ({{ auth()->user()->whatsapp }})
+                            Saya bersedia dihubungi via WhatsApp ({{ auth()?->user()?->whatsapp??'null' }})
                         </span>
                     </label>
 
@@ -367,11 +367,11 @@
                     }
 
                     // Reset classes
-                    $slot.removeClass('booked selected bg-red-50 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400');
+                    $slot.removeClass('booked selected bg-red-100 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400');
                     $slot.removeAttr('data-booking title').prop('disabled', false);
 
                     if (isBooked) {
-                        $slot.addClass('booked bg-red-50 text-red-700 border-red-200');
+                        $slot.addClass('booked bg-red-100 text-red-700 border-red-200');
                         $slot.attr('data-booking', JSON.stringify(bookingInfo));
                         $slot.html($slot.data('time') + ' 📞');
                         $slot.attr('title', `${bookingInfo.user?.name || 'Unknown'}`);

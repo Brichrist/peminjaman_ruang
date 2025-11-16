@@ -17,28 +17,31 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Public booking routes (no authentication required)
+Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('/bookings-schedule', [BookingController::class, 'schedule'])->name('bookings.schedule');
+Route::get('/', [BookingController::class, 'roomSchedule'])->name('bookings.room-schedule');
+Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability'])->name('bookings.check-availability');
+Route::get('/rooms', [RoomController::class, 'list'])->name('rooms.list');
 
 Route::middleware('auth')->group(function () {
+    // Dashboard - redirect to booking create for regular users
+    Route::get('/dashboard', function () {
+        if (auth()->user()?->isAdmin() ?? null) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('bookings.create');
+    })->name('dashboard');
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Booking routes
-    Route::resource('bookings', BookingController::class);
-    Route::get('/bookings-schedule', [BookingController::class, 'schedule'])->name('bookings.schedule');
-    Route::get('/room-schedule', [BookingController::class, 'roomSchedule'])->name('bookings.room-schedule');
-    Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability'])->name('bookings.check-availability');
-
-    // Room list for users
-    Route::get('/rooms', [RoomController::class, 'list'])->name('rooms.list');
 
     // Admin routes
     Route::prefix('admin')->group(function () {
@@ -54,4 +57,4 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

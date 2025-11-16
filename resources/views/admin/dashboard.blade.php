@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('Admin Dashboard') }}
         </h2>
     </x-slot>
@@ -60,15 +60,15 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Jadwal Hari Ini</h3>
-                        @if($todaysSchedule->count() > 0)
+                        @if ($todaysSchedule->count() > 0)
                             <div class="space-y-2">
-                                @foreach($todaysSchedule as $schedule)
+                                @foreach ($todaysSchedule as $schedule)
                                     <div class="border-l-4 border-blue-500 pl-4 py-2">
                                         <div class="font-medium">{{ $schedule->room->name }}</div>
                                         <div class="text-sm text-gray-600">
                                             {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
                                         </div>
-                                        <div class="text-sm">{{ $schedule->user->name }} - {{ $schedule->activity }}</div>
+                                        <div class="text-sm">{{ $schedule->getContactName() }} - {{ $schedule->activity }}</div>
                                     </div>
                                 @endforeach
                             </div>
@@ -82,12 +82,12 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Peminjaman Terbaru</h3>
-                        @if($recentBookings->count() > 0)
+                        @if ($recentBookings->count() > 0)
                             <div class="space-y-2">
-                                @foreach($recentBookings as $booking)
+                                @foreach ($recentBookings as $booking)
                                     <div class="flex justify-between items-start py-2 border-b">
                                         <div>
-                                            <div class="font-medium">{{ $booking->user->name }}</div>
+                                            <div class="font-medium">{{ $booking->getContactName() }}</div>
                                             <div class="text-sm text-gray-600">
                                                 {{ $booking->room->name }} - {{ $booking->booking_date->format('d/m/Y') }}
                                             </div>

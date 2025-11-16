@@ -19,7 +19,9 @@ class Booking extends Model
         'activity',
         'status',
         'cancelled_by',
-        'cancellation_reason'
+        'cancellation_reason',
+        'guest_name',
+        'guest_phone'
     ];
 
     protected $casts = [
@@ -34,6 +36,41 @@ class Booking extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    /**
+     * Get contact name - prioritize guest_name, fallback to user name
+     */
+    public function getContactName()
+    {
+        return $this->guest_name ?? $this->user?->name ?? 'Unknown';
+    }
+
+    /**
+     * Get contact phone - prioritize guest_phone, fallback to user whatsapp
+     */
+    public function getContactPhone()
+    {
+        return $this->guest_phone ?? $this->user?->whatsapp;
+    }
+
+    /**
+     * Format phone number for WhatsApp (convert 08xx to 628xx)
+     */
+    public function getFormattedWhatsApp()
+    {
+        $phone = $this->getContactPhone();
+
+        if (!$phone) {
+            return null;
+        }
+
+        // Convert 08xx to 628xx
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        return $phone;
     }
 
     public function isUpcoming()
@@ -73,8 +110,8 @@ class Booking extends Model
     public static function getTimeSlots()
     {
         $slots = [];
-        $startHour = 8; // 8 AM
-        $endHour = 20; // 8 PM
+        $startHour = 5; // 8 AM
+        $endHour = 23; // 8 PM
 
         for ($hour = $startHour; $hour < $endHour; $hour++) {
             for ($minute = 0; $minute < 60; $minute += 30) {
