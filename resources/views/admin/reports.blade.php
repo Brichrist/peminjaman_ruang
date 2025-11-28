@@ -87,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-purple-500">
+                {{-- <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-purple-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Selesai</p>
@@ -99,7 +99,7 @@
                             </svg>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

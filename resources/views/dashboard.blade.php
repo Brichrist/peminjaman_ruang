@@ -94,7 +94,7 @@
                 </a>
 
                 <!-- Schedule View -->
-                <a href="{{ route('bookings.schedule') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                {{-- <a href="{{ route('bookings.schedule') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                     <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="relative p-6">
                         <div class="w-14 h-14 bg-purple-100 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300">
@@ -109,7 +109,7 @@
                             Lihat jadwal peminjaman semua ruangan
                         </p>
                     </div>
-                </a>
+                </a> --}}
 
                 <!-- Profile Settings -->
                 <a href="{{ route('profile.edit') }}" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">

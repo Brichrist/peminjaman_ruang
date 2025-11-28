@@ -22,20 +22,18 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Public booking routes (no authentication required)
-Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
-Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-Route::get('/bookings-schedule', [BookingController::class, 'schedule'])->name('bookings.schedule');
 Route::get('/', [BookingController::class, 'roomSchedule'])->name('bookings.room-schedule');
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability'])->name('bookings.check-availability');
 Route::get('/rooms', [RoomController::class, 'list'])->name('rooms.list');
 
 Route::middleware('auth')->group(function () {
-    // Dashboard - redirect to booking create for regular users
+    // Dashboard - redirect based on user role
     Route::get('/dashboard', function () {
         if (auth()->user()?->isAdmin() ?? null) {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('bookings.create');
+        return redirect()->route('bookings.room-schedule');
     })->name('dashboard');
 
     // Profile routes
@@ -46,7 +44,6 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        Route::get('/bookings', [AdminController::class, 'bookings'])->name('admin.bookings');
         Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancelBooking'])->name('admin.bookings.cancel');
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::post('/users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');

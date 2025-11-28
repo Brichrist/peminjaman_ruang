@@ -24,14 +24,14 @@
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex ml-10 space-x-1">
                     @if (auth()->user()?->isAdmin() ?? null)
-                        <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}
+                        {{-- <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}
                               px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all
                               {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                             </svg>
                             Dashboard
-                        </a>
+                        </a> --}}
                     @endif
                     <a href="{{ route('bookings.room-schedule') }}" class="nav-item {{ request()->routeIs('bookings.room-schedule') ? 'active' : '' }}
                               px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all
@@ -42,14 +42,14 @@
                         Booking
                     </a>
                     @if (auth()->user()?->isAdmin() ?? null)
-                        <a href="{{ route('bookings.schedule') }}" class="nav-item {{ request()->routeIs('bookings.schedule') ? 'active' : '' }}
+                        {{-- <a href="{{ route('bookings.schedule') }}" class="nav-item {{ request()->routeIs('bookings.schedule') ? 'active' : '' }}
                               px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all
                               {{ request()->routeIs('bookings.schedule') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Riwayat
-                        </a>
+                        </a> --}}
 
                         <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.*') ? 'active' : '' }}
                                   px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all
@@ -152,7 +152,7 @@
 
             <!-- Mobile Menu Items -->
             <div class="px-2 py-2 space-y-1">
-                @if (auth()->user()?->isAdmin() ?? null)
+                {{-- @if (auth()->user()?->isAdmin() ?? null)
                     <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 rounded-lg text-sm font-medium
                       {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +160,7 @@
                         </svg>
                         Dashboard
                     </a>
-                @endif
+                @endif --}}
 
                 <a href="{{ route('bookings.room-schedule') }}" class="flex items-center px-3 py-2 rounded-lg text-sm font-medium
                       {{ request()->routeIs('bookings.room-schedule') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -170,13 +170,13 @@
                     Booking Ruangan
                 </a>
                 @if (auth()->user()?->isAdmin() ?? null)
-                    <a href="{{ route('bookings.schedule') }}" class="flex items-center px-3 py-2 rounded-lg text-sm font-medium
+                    {{-- <a href="{{ route('bookings.schedule') }}" class="flex items-center px-3 py-2 rounded-lg text-sm font-medium
                       {{ request()->routeIs('bookings.schedule') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Riwayat
-                    </a>
+                    </a> --}}
                 @endif
 
                 @if (auth()->user()?->isAdmin() ?? null)
@@ -233,13 +233,13 @@
             Booking
         </a>
         @if (auth()->user()?->isAdmin() ?? null)
-            <a href="{{ route('bookings.schedule') }}" class="flex flex-col items-center py-2 text-xs
+            {{-- <a href="{{ route('bookings.schedule') }}" class="flex flex-col items-center py-2 text-xs
                   {{ request()->routeIs('bookings.schedule') ? 'text-blue-600' : 'text-gray-500' }}">
                 <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Riwayat
-            </a>
+            </a> --}}
         @endif
         @if (auth()->user()?->isAdmin() ?? null)
             <a href="{{ route('profile.edit') }}" class="flex flex-col items-center py-2 text-xs

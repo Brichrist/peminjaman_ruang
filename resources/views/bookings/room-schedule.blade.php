@@ -539,7 +539,7 @@
                     }
 
                     // Reset classes and remove old data
-                    $slot.removeClass('booked selected bg-red-100 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
+                    $slot.removeClass('booked selected bg-red-100 border-red-200 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
                     $slot.removeAttr('data-booking');
                     $slot.removeAttr('title');
                     $slot.prop('disabled', false);
