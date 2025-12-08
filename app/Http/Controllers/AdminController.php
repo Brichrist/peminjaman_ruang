@@ -126,38 +126,91 @@ class AdminController extends Controller
     {
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth());
         $endDate = $request->get('end_date', Carbon::now()->endOfMonth());
+        $selectedRooms = $request->get('room_ids', []);
 
-        $bookingStats = Booking::whereBetween('booking_date', [$startDate, $endDate])
-            ->selectRaw('
-                COUNT(*) as total,
-                SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
-                SUM(CASE WHEN status = "cancelled" THEN 1 ELSE 0 END) as cancelled,
-                SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed
-            ')
-            ->first();
+        // Get all rooms for filter
+        $rooms = Room::orderBy('name')->get();
 
-        $roomUsage = Room::withCount(['bookings' => function ($query) use ($startDate, $endDate) {
-            $query->whereBetween('booking_date', [$startDate, $endDate])
-                ->where('status', 'approved');
-        }])
-            ->orderBy('bookings_count', 'desc')
-            ->get();
+        // If no rooms selected, select all by default
+        if (empty($selectedRooms)) {
+            $selectedRooms = $rooms->pluck('id')->toArray();
+        }
 
-        $topUsers = User::withCount(['bookings' => function ($query) use ($startDate, $endDate) {
-            $query->whereBetween('booking_date', [$startDate, $endDate])
-                ->where('status', 'approved');
-        }])
-            ->where('is_admin', false)
-            ->orderBy('bookings_count', 'desc')
-            ->limit(10)
-            ->get();
+        // Get bookings grouped by date
+        $bookingsQuery = Booking::with(['user', 'room'])
+            ->whereBetween('booking_date', [$startDate, $endDate])
+            ->whereIn('room_id', $selectedRooms)
+            ->where('status', 'approved')
+            ->orderBy('booking_date')
+            ->orderBy('room_id')
+            ->orderBy('start_time');
+
+        $bookings = $bookingsQuery->get();
+
+        // Group bookings by date
+        $bookingsByDate = $bookings->groupBy(function ($booking) {
+            return $booking->booking_date->format('Y-m-d');
+        });
 
         return view('admin.reports', compact(
-            'bookingStats',
-            'roomUsage',
-            'topUsers',
+            'rooms',
+            'selectedRooms',
+            'bookingsByDate',
             'startDate',
             'endDate'
         ));
+    }
+
+    public function downloadReportPDF(Request $request)
+    {
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth());
+        $endDate = $request->get('end_date', Carbon::now()->endOfMonth());
+        $selectedRooms = $request->get('room_ids', []);
+
+        // Get all rooms for filter
+        $rooms = Room::orderBy('name')->get();
+
+        // If no rooms selected, select all by default
+        if (empty($selectedRooms)) {
+            $selectedRooms = $rooms->pluck('id')->toArray();
+        }
+
+        // Get bookings grouped by date
+        $bookingsQuery = Booking::with(['user', 'room'])
+            ->whereBetween('booking_date', [$startDate, $endDate])
+            ->whereIn('room_id', $selectedRooms)
+            ->where('status', 'approved')
+            ->orderBy('booking_date')
+            ->orderBy('room_id')
+            ->orderBy('start_time');
+
+        $bookings = $bookingsQuery->get();
+
+        // Group bookings by date
+        $bookingsByDate = $bookings->groupBy(function ($booking) {
+            return $booking->booking_date->format('Y-m-d');
+        });
+
+        $pdf = \PDF::loadView('admin.reports-pdf', compact(
+            'bookingsByDate',
+            'startDate',
+            'endDate',
+            'selectedRooms',
+            'rooms'
+        ));
+
+        // Set paper size and orientation
+        $pdf->setPaper('A4', 'portrait');
+
+        // Set options for better rendering
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'DejaVu Sans'
+        ]);
+
+        $filename = 'Laporan-Peminjaman-' . Carbon::parse($startDate)->format('d-M-Y') . '-sd-' . Carbon::parse($endDate)->format('d-M-Y') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

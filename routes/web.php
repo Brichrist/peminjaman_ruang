@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::post('/users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+        Route::get('/reports/download', [AdminController::class, 'downloadReportPDF'])->name('admin.reports.download');
 
         // Room management
         Route::resource('rooms', RoomController::class);
