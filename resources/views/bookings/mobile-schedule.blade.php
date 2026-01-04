@@ -466,8 +466,8 @@
                         }
                     }
 
-                    // Reset classes
-                    $slot.removeClass('booked selected bg-red-100 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400');
+                    // Reset ALL styling classes
+                    $slot.removeClass('booked selected bg-red-100 text-red-700 border-red-200 bg-blue-600 bg-blue-100 text-white text-blue-800 ring-2 ring-blue-400 border-blue-400 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
                     $slot.removeAttr('data-booking title').prop('disabled', false);
 
                     if (isBooked) {
@@ -476,10 +476,11 @@
                         $slot.html($slot.data('time') + ' 📞');
                         $slot.attr('title', `${bookingInfo.contact_name || 'Unknown'}`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
-                        $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
+                        // Selected state - light blue background with dark blue text for visibility
+                        $slot.addClass('selected bg-blue-100 text-blue-800 ring-2 ring-blue-400 border-blue-400');
                         $slot.html($slot.data('time'));
                     } else {
-                        $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700');
+                        $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700 border-gray-200');
                         $slot.html($slot.data('time'));
                     }
 
