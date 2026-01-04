@@ -2,34 +2,34 @@
     @include('components.toast-notification')
 
     <!-- Mobile-First Design -->
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 overflow-x-hidden">
         <!-- Header -->
-        <div class="sticky top-0 z-30 bg-white shadow-sm">
+        <div class="sticky top-0 z-30 bg-white shadow-sm overflow-hidden">
             <div class="px-4 py-3">
-                <h1 class="text-lg font-bold text-gray-900">Booking Ruangan</h1>
-                <p class="text-xs text-gray-500">Pilih ruangan dan waktu yang tersedia</p>
+                <h1 class="text-lg font-bold text-gray-900 truncate">Booking Ruangan</h1>
+                <p class="text-xs text-gray-500 truncate">Pilih ruangan dan waktu yang tersedia</p>
             </div>
         </div>
 
         <!-- Date & Filter Section -->
-        <div class="bg-white border-b sticky top-[4.5rem] z-20">
-            <div class="px-4 py-3 space-y-3">
+        <div class="bg-white border-b sticky top-[4.5rem] z-20 overflow-hidden">
+            <div class="px-4 py-3 space-y-3 max-w-full">
                 <!-- Date Picker -->
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Tanggal:</label>
+                <div class="flex items-center gap-2 min-w-0">
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap flex-shrink-0">Tanggal:</label>
                     <input type="date" id="booking-date"
-                           class="flex-1 text-sm rounded-lg border-gray-300 shadow-sm"
+                           class="flex-1 min-w-0 text-sm rounded-lg border-gray-300 shadow-sm"
                            value="{{ date('Y-m-d') }}"
                            min="{{ date('Y-m-d') }}">
                 </div>
 
                 <!-- Room Filter -->
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Ruangan:</label>
-                    <select id="room-filter" class="flex-1 text-sm rounded-lg border-gray-300 shadow-sm">
+                <div class="flex items-center gap-2 min-w-0">
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap flex-shrink-0">Ruangan:</label>
+                    <select id="room-filter" class="flex-1 min-w-0 text-sm rounded-lg border-gray-300 shadow-sm truncate">
                         <option value="">Semua Ruangan</option>
                         @foreach($rooms as $room)
-                            <option value="{{ $room->id }}">{{ $room->name }}</option>
+                            <option value="{{ $room->id }}">{{ Str::limit($room->name, 30) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -55,24 +55,24 @@
         </div>
 
         <!-- Information Note -->
-        <div class="mx-4 mt-4 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
-            <div class="flex items-start">
+        <div class="mx-4 mt-4 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg overflow-hidden">
+            <div class="flex items-start min-w-0">
                 <svg class="w-4 h-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                 </svg>
-                <p class="text-xs text-blue-700">
+                <p class="text-xs text-blue-700 min-w-0">
                     <strong>Catatan:</strong> Silahkan booking ruangan dari waktu mulai hingga waktu selesai acara
                 </p>
             </div>
         </div>
 
         <!-- Room Cards - Mobile Optimized -->
-        <div class="px-4 py-4 space-y-4" id="room-grid">
+        <div class="px-4 py-4 space-y-4 overflow-hidden" id="room-grid">
             @foreach($rooms as $room)
             <div class="room-card bg-white rounded-xl shadow-sm overflow-hidden" data-room-id="{{ $room->id }}">
                 <!-- Room Header -->
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3">
-                    <h3 class="font-semibold text-sm">{{ $room->name }}</h3>
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 overflow-hidden">
+                    <h3 class="font-semibold text-sm truncate">{{ $room->name }}</h3>
                     <div class="flex items-center gap-3 mt-1 text-xs">
                         <span class="flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,13 +89,13 @@
                 </div>
 
                 <!-- Room Description -->
-                <div class="px-3 pt-3 pb-2">
-                    <p class="text-xs text-gray-600">{{ Str::limit($room->description, 60) }}</p>
+                <div class="px-3 pt-3 pb-2 overflow-hidden">
+                    <p class="text-xs text-gray-600 break-words">{{ Str::limit($room->description, 60) }}</p>
                 </div>
 
                 <!-- Time Slots Grid - Mobile Optimized -->
-                <div class="px-3 pb-3">
-                    <div class="grid grid-cols-4 gap-1.5 time-slots-container" data-room-id="{{ $room->id }}">
+                <div class="px-3 pb-3 overflow-hidden">
+                    <div class="grid grid-cols-4 gap-1.5 time-slots-container w-full" data-room-id="{{ $room->id }}">
                         @php
                             $timeSlots = [];
                             $startHour = 5;
@@ -137,16 +137,16 @@
         </div>
 
         <!-- Floating Action Button - Mobile -->
-        <div id="floating-action" class="hidden fixed bottom-20 inset-x-4 bg-white rounded-xl shadow-2xl p-4 z-40 border">
-            <div class="flex items-center justify-between">
-                <div>
+        <div id="floating-action" class="hidden fixed bottom-20 left-4 right-4 bg-white rounded-xl shadow-2xl p-4 z-40 border overflow-hidden">
+            <div class="flex items-center justify-between gap-2 min-w-0">
+                <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium text-gray-700">
                         <span id="selected-count">0</span> slot dipilih
                     </p>
-                    <p class="text-xs text-gray-500" id="selected-room-info"></p>
+                    <p class="text-xs text-gray-500 truncate" id="selected-room-info"></p>
                 </div>
                 <button id="create-booking-btn"
-                        class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition font-medium">
+                        class="flex-shrink-0 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition font-medium whitespace-nowrap">
                     Buat Booking
                 </button>
             </div>
