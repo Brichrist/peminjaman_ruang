@@ -86,7 +86,7 @@
                     <div class="p-4">
                         <p class="text-sm text-gray-600 mb-3">{{ $room->description }}</p>
 
-                        <div class="grid grid-cols-4 gap-2 time-slots-container" data-room-id="{{ $room->id }}">
+                        <div class="grid grid-cols-3 gap-2 time-slots-container" data-room-id="{{ $room->id }}">
                             @php
                                 $timeSlots = [];
                                 $startHour = 5;
@@ -99,13 +99,31 @@
                             @endphp
 
                             @foreach($timeSlots as $slot)
+                                @php
+                                    $parts = explode(':', $slot);
+                                    $slotHour = (int)$parts[0];
+                                    $slotMin = (int)$parts[1];
+
+                                    // Calculate end time (+30 minutes)
+                                    $endMin = $slotMin + 30;
+                                    $endHourCalc = $slotHour;
+                                    if ($endMin >= 60) {
+                                        $endMin = 0;
+                                        $endHourCalc++;
+                                    }
+
+                                    $displayStart = sprintf('%02d.%02d', $slotHour, $slotMin);
+                                    $displayEnd = sprintf('%02d.%02d', $endHourCalc, $endMin);
+                                    $displayText = $displayStart . ' - ' . $displayEnd;
+                                @endphp
                                 <button
                                     class="time-slot px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200
                                            bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300"
                                     data-time="{{ $slot }}"
+                                    data-display="{{ $displayText }}"
                                     data-room-id="{{ $room->id }}"
                                     data-room-name="{{ $room->name }}">
-                                    {{ $slot }}
+                                    {{ $displayText }}
                                 </button>
                             @endforeach
                         </div>
@@ -544,6 +562,8 @@
                     $slot.removeAttr('title');
                     $slot.prop('disabled', false);
 
+                    const displayText = $slot.data('display') || $slot.data('time');
+
                     if (isBooked) {
                         // Style for booked slots
                         $slot.addClass('booked bg-red-100 text-red-700 border-red-200 cursor-pointer hover:bg-red-100');
@@ -553,16 +573,16 @@
                         $slot.prop('disabled', false); // Enable click for WhatsApp contact
 
                         // Add visual indicator and tooltip
-                        $slot.html($slot.data('time') + ' <span class="text-xs">📞</span>');
+                        $slot.html(displayText + ' <span class="text-xs">📞</span>');
                         $slot.attr('title', `Dipesan oleh: ${bookingInfo.contact_name || 'Unknown'} - Klik untuk hubungi`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
                         // Style for selected slots
                         $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
-                        $slot.html($slot.data('time')); // Reset text
+                        $slot.html(displayText); // Reset text
                     } else {
                         // Style for available slots
                         $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
-                        $slot.html($slot.data('time')); // Reset text
+                        $slot.html(displayText); // Reset text
                     }
                 });
             }

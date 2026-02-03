@@ -95,7 +95,7 @@
 
                 <!-- Time Slots Grid - Mobile Optimized -->
                 <div class="px-3 pb-3 overflow-hidden">
-                    <div class="grid grid-cols-4 gap-1.5 time-slots-container w-full" data-room-id="{{ $room->id }}">
+                    <div class="grid grid-cols-3 gap-1.5 time-slots-container w-full" data-room-id="{{ $room->id }}">
                         @php
                             $timeSlots = [];
                             $startHour = 5;
@@ -108,14 +108,32 @@
                         @endphp
 
                         @foreach($timeSlots as $slot)
+                            @php
+                                $parts = explode(':', $slot);
+                                $slotHour = (int)$parts[0];
+                                $slotMin = (int)$parts[1];
+
+                                // Calculate end time (+30 minutes)
+                                $endMin = $slotMin + 30;
+                                $endHourCalc = $slotHour;
+                                if ($endMin >= 60) {
+                                    $endMin = 0;
+                                    $endHourCalc++;
+                                }
+
+                                $displayStart = sprintf('%02d.%02d', $slotHour, $slotMin);
+                                $displayEnd = sprintf('%02d.%02d', $endHourCalc, $endMin);
+                                $displayText = $displayStart . ' - ' . $displayEnd;
+                            @endphp
                             <button
                                 class="time-slot px-1 py-2 text-xs font-medium rounded-lg transition-all
                                        bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700
                                        border border-gray-200 hover:border-blue-300"
                                 data-time="{{ $slot }}"
+                                data-display="{{ $displayText }}"
                                 data-room-id="{{ $room->id }}"
                                 data-room-name="{{ $room->name }}">
-                                {{ $slot }}
+                                {{ $displayText }}
                             </button>
                         @endforeach
                     </div>
@@ -470,18 +488,20 @@
                     $slot.removeClass('booked selected bg-red-100 text-red-700 border-red-200 bg-blue-600 bg-blue-100 text-white text-blue-800 ring-2 ring-blue-400 border-blue-400 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
                     $slot.removeAttr('data-booking title').prop('disabled', false);
 
+                    const displayText = $slot.data('display') || $slot.data('time');
+
                     if (isBooked) {
                         $slot.addClass('booked bg-red-100 text-red-700 border-red-200');
                         $slot.attr('data-booking', JSON.stringify(bookingInfo));
-                        $slot.html($slot.data('time') + ' 📞');
+                        $slot.html(displayText + ' 📞');
                         $slot.attr('title', `${bookingInfo.contact_name || 'Unknown'}`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
                         // Selected state - light blue background with dark blue text for visibility
                         $slot.addClass('selected bg-blue-100 text-blue-800 ring-2 ring-blue-400 border-blue-400');
-                        $slot.html($slot.data('time'));
+                        $slot.html(displayText);
                     } else {
                         $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700 border-gray-200');
-                        $slot.html($slot.data('time'));
+                        $slot.html(displayText);
                     }
 
                     // Apply time filter
