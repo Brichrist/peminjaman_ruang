@@ -107,11 +107,6 @@ class BookingController extends Controller
     {
         $rooms = Room::where('status', 'available')->orderBy('name')->get();
 
-        // Detect mobile device
-        $isMobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', request()->header('User-Agent'));
-
-        $view = $isMobile ? 'bookings.mobile-schedule' : 'bookings.room-schedule';
-
-        return view($view, compact('rooms'));
+        return view('bookings.room-schedule', compact('rooms'));
     }
 }

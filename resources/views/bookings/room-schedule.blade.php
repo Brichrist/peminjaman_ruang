@@ -3,90 +3,97 @@
         <h2 class="font-semibold text-xl text-white leading-tight">
             Jadwal & Peminjaman Ruangan
         </h2>
-        <p class="text-blue-100 text-sm mt-1">jadwalkan peminjaman ruangan Anda</p>
+        <p class="text-blue-100 text-sm mt-1 hidden sm:block">Jadwalkan peminjaman ruangan Anda</p>
     </x-slot>
 
     @include('components.toast-notification')
 
-    <div class="py-6 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Date Selector -->
-            <div class="bg-white rounded-xl shadow-sm mb-6 p-4">
-                <div class="flex flex-col sm:flex-row gap-4 items-center">
+    <div class="min-h-screen bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <!-- Date & Filter Section -->
+            <div class="bg-white rounded-xl shadow-sm mb-4 sm:mb-6 p-4">
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end">
+                    <!-- Date Picker -->
                     <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Tanggal</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Pilih Tanggal</label>
                         <input type="date" id="booking-date"
-                               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                               class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                value="{{ date('Y-m-d') }}"
                                min="{{ date('Y-m-d') }}">
                     </div>
+
+                    <!-- Room Filter -->
                     <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter Ruangan</label>
-                        <select id="room-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Filter Ruangan</label>
+                        <select id="room-filter" class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Ruangan</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}">{{ $room->name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="flex items-end gap-2">
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 sm:flex-shrink-0">
                         <button id="filter-time-btn"
-                                class="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition duration-200 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            Filter Jam
+                            <span class="hidden sm:inline">Filter Jam</span>
+                            <span class="sm:hidden">Jam</span>
                         </button>
                         <button id="refresh-btn"
-                                class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
-                            Refresh
+                            <span>Refresh</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Information Note -->
-            <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+            <div class="mb-4 sm:mb-6 bg-blue-50 border-l-4 border-blue-500 p-3 sm:p-4 rounded-r-lg">
                 <div class="flex items-start">
-                    <svg class="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                     </svg>
-                    <p class="text-sm text-blue-700">
+                    <p class="text-xs sm:text-sm text-blue-700">
                         <strong>Catatan:</strong> Silahkan booking ruangan dari waktu mulai hingga waktu selesai acara
                     </p>
                 </div>
             </div>
 
             <!-- Room Cards Grid -->
-            <div id="room-grid" class="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+            <div id="room-grid" class="grid gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
                 @foreach($rooms as $room)
                 <div class="room-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-200" data-room-id="{{ $room->id }}">
                     <!-- Room Header -->
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-                        <h3 class="text-lg font-semibold">{{ $room->name }}</h3>
-                        <div class="flex items-center gap-4 mt-2 text-sm">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 sm:p-4">
+                        <h3 class="text-base sm:text-lg font-semibold truncate">{{ $room->name }}</h3>
+                        <div class="flex items-center gap-3 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm">
                             <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
-                                Kapasitas: {{ $room->capacity }}
+                                <span class="hidden sm:inline">Kapasitas:</span> {{ $room->capacity }} <span class="sm:hidden">org</span><span class="hidden sm:inline">orang</span>
                             </span>
                             @if($room->status == 'available')
-                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Tersedia</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium">Tersedia</span>
                             @else
-                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Tidak Tersedia</span>
+                                <span class="bg-red-100 text-red-800 px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium">Tidak Tersedia</span>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Time Slots Grid -->
-                    <div class="p-4">
-                        <p class="text-sm text-gray-600 mb-3">{{ $room->description }}</p>
+                    <!-- Room Content -->
+                    <div class="p-3 sm:p-4">
+                        <p class="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">{{ $room->description }}</p>
 
-                        <div class="grid grid-cols-3 gap-2 time-slots-container" data-room-id="{{ $room->id }}">
+                        <!-- Time Slots Grid -->
+                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2 time-slots-container" data-room-id="{{ $room->id }}">
                             @php
                                 $timeSlots = [];
                                 $startHour = 5;
@@ -117,7 +124,7 @@
                                     $displayText = $displayStart . ' - ' . $displayEnd;
                                 @endphp
                                 <button
-                                    class="time-slot px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200
+                                    class="time-slot px-1 sm:px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200
                                            bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300"
                                     data-time="{{ $slot }}"
                                     data-display="{{ $displayText }}"
@@ -129,12 +136,13 @@
                         </div>
 
                         <!-- Quick Action Buttons -->
-                        <div class="mt-4 flex gap-2">
-                            <button class="select-all-btn flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
+                        <div class="mt-3 sm:mt-4 flex gap-2">
+                            <button class="select-all-btn flex-1 text-xs sm:text-sm py-2 px-2 sm:px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
                                     data-room-id="{{ $room->id }}">
-                                Pilih Semua Tersedia
+                                <span class="hidden sm:inline">Pilih Semua Tersedia</span>
+                                <span class="sm:hidden">Pilih Semua</span>
                             </button>
-                            <button class="clear-selection-btn flex-1 text-sm py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
+                            <button class="clear-selection-btn flex-1 text-xs sm:text-sm py-2 px-2 sm:px-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition duration-200"
                                     data-room-id="{{ $room->id }}">
                                 Hapus Pilihan
                             </button>
@@ -143,127 +151,134 @@
                 </div>
                 @endforeach
             </div>
+        </div>
 
-            <!-- Floating Action Button -->
-            <div id="floating-action" class="hidden fixed bottom-6 right-6 bg-white rounded-xl shadow-lg p-4 z-40">
-                <div class="text-sm font-medium text-gray-700 mb-2">
-                    <span id="selected-count">0</span> slot terpilih
+        <!-- Floating Action Button - Responsive -->
+        <div id="floating-action" class="hidden fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 bg-white rounded-xl shadow-2xl p-4 z-40 border sm:min-w-[280px]">
+            <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium text-gray-700">
+                        <span id="selected-count">0</span> slot terpilih
+                    </p>
+                    <p class="text-xs text-gray-500 truncate" id="selected-room-info"></p>
                 </div>
                 <button id="create-booking-btn"
-                        class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
-                    Buat Peminjaman
+                        class="flex-shrink-0 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition duration-200 font-medium whitespace-nowrap">
+                    Buat Booking
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Booking Modal -->
-    <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white border-b px-6 py-4">
+    <!-- Booking Modal - Responsive -->
+    <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-2xl sm:rounded-xl w-full sm:max-w-md max-h-[90vh] overflow-hidden">
+            <div class="sticky top-0 bg-white border-b px-4 sm:px-6 py-3 sm:py-4">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-semibold text-gray-900">Formulir Peminjaman</h3>
-                    <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Formulir Peminjaman</h3>
+                    <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 p-1">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
             </div>
 
-            <form id="booking-form" method="POST" action="{{ route('bookings.store') }}" class="p-6">
-                @csrf
-                <input type="hidden" name="room_id" id="modal-room-id">
-                <input type="hidden" name="booking_date" id="modal-booking-date">
-                <input type="hidden" name="start_time" id="modal-start-time">
-                <input type="hidden" name="end_time" id="modal-end-time">
+            <div class="overflow-y-auto">
+                <form id="booking-form" method="POST" action="{{ route('bookings.store') }}" class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    @csrf
+                    <input type="hidden" name="room_id" id="modal-room-id">
+                    <input type="hidden" name="booking_date" id="modal-booking-date">
+                    <input type="hidden" name="start_time" id="modal-start-time">
+                    <input type="hidden" name="end_time" id="modal-end-time">
 
-                <!-- Summary -->
-                <div class="bg-blue-50 rounded-lg p-4 mb-6">
-                    <h4 class="font-medium text-blue-900 mb-2">Ringkasan Peminjaman</h4>
-                    <div class="space-y-1 text-sm text-blue-700">
-                        <p>Ruangan: <span id="modal-room-name" class="font-medium"></span></p>
-                        <p>Tanggal: <span id="modal-date-display" class="font-medium"></span></p>
-                        <p>Waktu: <span id="modal-time-display" class="font-medium"></span></p>
-                        <p>Durasi: <span id="modal-duration" class="font-medium"></span></p>
+                    <!-- Summary -->
+                    <div class="bg-blue-50 rounded-lg p-3 sm:p-4">
+                        <h4 class="font-medium text-sm sm:text-base text-blue-900 mb-2">Ringkasan Peminjaman</h4>
+                        <div class="space-y-1 text-xs sm:text-sm text-blue-700">
+                            <p>Ruangan: <span id="modal-room-name" class="font-medium"></span></p>
+                            <p>Tanggal: <span id="modal-date-display" class="font-medium"></span></p>
+                            <p>Waktu: <span id="modal-time-display" class="font-medium"></span></p>
+                            <p>Durasi: <span id="modal-duration" class="font-medium"></span></p>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Guest Information -->
-                <div class="mb-6">
-                    <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nama Lengkap <span class="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        name="guest_name"
-                        id="guest_name"
-                        required
-                        placeholder="Masukkan nama lengkap Anda"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
+                    <!-- Guest Information -->
+                    <div>
+                        <label for="guest_name" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                            Nama Lengkap <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="guest_name"
+                            id="guest_name"
+                            required
+                            placeholder="Masukkan nama lengkap"
+                            class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
 
-                <div class="mb-6">
-                    <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nomor Telepon/WhatsApp <span class="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        name="guest_phone"
-                        id="guest_phone"
-                        required
-                        placeholder="08xx atau 628xx"
-                        pattern="^(0|62)[0-9]{9,13}$"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxx atau 628xxxxxxxxx</p>
-                </div>
+                    <div>
+                        <label for="guest_phone" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                            Nomor Telepon/WhatsApp <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="guest_phone"
+                            id="guest_phone"
+                            required
+                            placeholder="08xx atau 628xx"
+                            pattern="^(0|62)[0-9]{9,13}$"
+                            class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxx atau 628xxxxxxxxx</p>
+                    </div>
 
-                <!-- Activity Field -->
-                <div class="mb-6">
-                    <label for="activity" class="block text-sm font-medium text-gray-700 mb-2">
-                        Kegiatan <span class="text-red-500">*</span>
-                    </label>
-                    <textarea
-                        name="activity"
-                        id="activity"
-                        rows="3"
-                        required
-                        placeholder="Deskripsikan kegiatan yang akan dilakukan..."
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
-                </div>
+                    <!-- Activity Field -->
+                    <div>
+                        <label for="activity" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                            Kegiatan <span class="text-red-500">*</span>
+                        </label>
+                        <textarea
+                            name="activity"
+                            id="activity"
+                            rows="3"
+                            required
+                            placeholder="Deskripsikan kegiatan yang akan dilakukan..."
+                            class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
 
-                <!-- Action Buttons -->
-                <div class="flex gap-3">
-                    <button type="button" id="cancel-modal-btn"
-                            class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200">
-                        Batal
-                    </button>
-                    <button type="submit"
-                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
-                        Konfirmasi Peminjaman
-                    </button>
-                </div>
-            </form>
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 sm:gap-3 pt-2">
+                        <button type="button" id="cancel-modal-btn"
+                                class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+                            Konfirmasi
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- WhatsApp Contact Modal -->
-    <div id="wa-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full shadow-2xl">
-            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-xl">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+    <!-- WhatsApp Contact Modal - Responsive -->
+    <div id="wa-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-2xl sm:rounded-xl w-full sm:max-w-md shadow-2xl">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl sm:rounded-t-xl">
+                <h3 class="text-lg sm:text-xl font-semibold flex items-center">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
                     </svg>
                     Informasi Peminjam
                 </h3>
             </div>
 
-            <div class="p-6">
-                <div class="bg-gray-50 rounded-lg p-4 mb-4 space-y-3">
+            <div class="p-4 sm:p-6">
+                <div class="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 space-y-2 sm:space-y-3">
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Nama Peminjam</p>
-                        <p class="text-gray-900 font-medium flex items-center">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-0.5 sm:mb-1">Nama Peminjam</p>
+                        <p class="text-sm sm:text-base text-gray-900 font-medium flex items-center">
                             <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
@@ -272,8 +287,8 @@
                     </div>
 
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Kegiatan</p>
-                        <p class="text-gray-900 flex items-start">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-0.5 sm:mb-1">Kegiatan</p>
+                        <p class="text-sm sm:text-base text-gray-900 flex items-start">
                             <svg class="w-4 h-4 mr-2 mt-0.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
@@ -282,25 +297,25 @@
                     </div>
                 </div>
 
-                <div id="no-wa-message" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div id="no-wa-message" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-3 sm:p-4 mb-4">
                     <div class="flex">
-                        <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                         </svg>
-                        <p class="text-sm text-yellow-700">
+                        <p class="text-xs sm:text-sm text-yellow-700">
                             Nomor WhatsApp tidak tersedia untuk peminjam ini
                         </p>
                     </div>
                 </div>
 
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <button id="close-wa-modal"
-                            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                            class="flex-1 px-4 py-2.5 sm:py-3 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
                         Tutup
                     </button>
                     <a id="wa-link" href="#" target="_blank"
-                       class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 text-center flex items-center justify-center font-medium">
-                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                       class="flex-1 px-4 py-2.5 sm:py-3 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition duration-200 text-center flex items-center justify-center font-medium">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
                         </svg>
                         Hubungi
@@ -311,8 +326,8 @@
                                 @csrf
                                 <button type="submit"
                                         onclick="return confirm('Apakah Anda yakin ingin membatalkan peminjaman ini?')"
-                                        class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 font-medium flex items-center justify-center">
-                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-4 py-2.5 sm:py-3 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition duration-200 font-medium flex items-center justify-center">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                     Batalkan
@@ -325,27 +340,27 @@
         </div>
     </div>
 
-    <!-- Time Filter Modal -->
-    <div id="time-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full shadow-2xl">
-            <div class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Time Filter Modal - Responsive -->
+    <div id="time-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-2xl sm:rounded-xl w-full sm:max-w-md shadow-2xl">
+            <div class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl sm:rounded-t-xl">
+                <h3 class="text-lg sm:text-xl font-semibold flex items-center">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Filter Waktu
                 </h3>
             </div>
 
-            <div class="p-6">
-                <p class="text-sm text-gray-600 mb-4">Pilih rentang waktu yang ingin ditampilkan</p>
+            <div class="p-4 sm:p-6">
+                <p class="text-xs sm:text-sm text-gray-600 mb-4">Pilih rentang waktu yang ingin ditampilkan</p>
 
                 <div class="space-y-4 mb-6">
                     <div>
-                        <label for="filter-start-time" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="filter-start-time" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Dari Jam
                         </label>
-                        <select id="filter-start-time" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                        <select id="filter-start-time" class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                             <option value="">Pilih jam mulai</option>
                             @php
                                 $filterSlots = [];
@@ -361,10 +376,10 @@
                     </div>
 
                     <div>
-                        <label for="filter-end-time" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="filter-end-time" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Sampai Jam
                         </label>
-                        <select id="filter-end-time" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                        <select id="filter-end-time" class="w-full text-sm sm:text-base rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                             <option value="">Pilih jam selesai</option>
                             @foreach($filterSlots as $slot)
                                 <option value="{{ $slot }}">{{ $slot }}</option>
@@ -373,14 +388,14 @@
                     </div>
                 </div>
 
-                <div class="flex gap-3">
+                <div class="flex gap-2 sm:gap-3">
                     <button id="reset-time-filter"
-                            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                            class="flex-1 px-4 py-2.5 sm:py-3 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
                         Reset Filter
                     </button>
                     <button id="apply-time-filter"
-                            class="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
-                        Terapkan Filter
+                            class="flex-1 px-4 py-2.5 sm:py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
+                        Terapkan
                     </button>
                 </div>
             </div>
@@ -420,11 +435,8 @@
                     e.preventDefault();
                     e.stopPropagation();
 
-                    // Get booking data from attribute
                     const bookingDataStr = $(this).attr('data-booking');
                     const roomName = $(this).data('room-name');
-
-                    console.log('Clicked booked slot, data:', bookingDataStr); // Debug
 
                     if (bookingDataStr) {
                         try {
@@ -432,10 +444,7 @@
                             showWaContact(bookingData, roomName);
                         } catch (err) {
                             console.error('Error parsing booking data:', err);
-                            alert('Error loading booking information');
                         }
-                    } else {
-                        console.warn('No booking data found for this slot');
                     }
                 });
 
@@ -454,6 +463,14 @@
                 $('#create-booking-btn').on('click', openBookingModal);
                 $('#close-modal-btn, #cancel-modal-btn').on('click', closeBookingModal);
                 $('#close-wa-modal').on('click', closeWaModal);
+
+                // Close modals on backdrop click
+                $('#booking-modal, #wa-modal, #time-filter-modal').on('click', function(e) {
+                    if (e.target === this) {
+                        $(this).addClass('hidden');
+                        $('body').removeClass('overflow-hidden');
+                    }
+                });
 
                 // Form submission with validation
                 $('#booking-form').on('submit', function(e) {
@@ -489,13 +506,11 @@
                 selectedSlots.clear();
                 updateFloatingAction();
 
-                // Get all room IDs
                 const roomIds = [];
                 $('.room-card').each(function() {
                     roomIds.push($(this).data('room-id'));
                 });
 
-                // Fetch bookings for all rooms
                 for (const roomId of roomIds) {
                     await fetchRoomBookings(roomId, date);
                 }
@@ -541,11 +556,10 @@
 
                         if (slotMinutes < startMinutes || slotMinutes >= endMinutes) {
                             $slot.hide();
-                            return; // Skip this slot
+                            return;
                         }
                     }
 
-                    // Show slot if not filtered
                     $slot.show();
 
                     for (const booking of bookings) {
@@ -557,7 +571,7 @@
                     }
 
                     // Reset classes and remove old data
-                    $slot.removeClass('booked selected bg-red-100 border-red-200 text-red-700 bg-blue-600 text-white ring-2 ring-blue-400 bg-gray-50 hover:bg-blue-50');
+                    $slot.removeClass('booked selected bg-red-100 border-red-200 text-red-700 bg-blue-600 bg-blue-100 text-white text-blue-800 ring-2 ring-blue-400 border-blue-400 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
                     $slot.removeAttr('data-booking');
                     $slot.removeAttr('title');
                     $slot.prop('disabled', false);
@@ -565,31 +579,22 @@
                     const displayText = $slot.data('display') || $slot.data('time');
 
                     if (isBooked) {
-                        // Style for booked slots
-                        $slot.addClass('booked bg-red-100 text-red-700 border-red-200 cursor-pointer hover:bg-red-100');
-
-                        // Store booking data properly
+                        $slot.addClass('booked bg-red-100 text-red-700 border-red-200 cursor-pointer hover:bg-red-200');
                         $slot.attr('data-booking', JSON.stringify(bookingInfo));
-                        $slot.prop('disabled', false); // Enable click for WhatsApp contact
-
-                        // Add visual indicator and tooltip
+                        $slot.prop('disabled', false);
                         $slot.html(displayText + ' <span class="text-xs">📞</span>');
                         $slot.attr('title', `Dipesan oleh: ${bookingInfo.contact_name || 'Unknown'} - Klik untuk hubungi`);
                     } else if (selectedSlots.get(roomId)?.has($slot.data('time'))) {
-                        // Style for selected slots
-                        $slot.addClass('selected bg-blue-600 text-white ring-2 ring-blue-400');
-                        $slot.html(displayText); // Reset text
+                        $slot.addClass('selected bg-blue-100 text-blue-800 ring-2 ring-blue-400 border-blue-400');
+                        $slot.html(displayText);
                     } else {
-                        // Style for available slots
                         $slot.addClass('bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200 hover:border-blue-300');
-                        $slot.html(displayText); // Reset text
+                        $slot.html(displayText);
                     }
                 });
             }
 
             function isTimeInRange(time, startTime, endTime) {
-                // A slot is considered booked if it falls within the booking time range
-                // We use >= for start and < for end to allow consecutive bookings
                 return time >= startTime && time < endTime;
             }
 
@@ -606,7 +611,6 @@
                 if (roomSlots.has(time)) {
                     roomSlots.delete(time);
                 } else {
-                    // Clear other room selections
                     if (selectedSlots.size > 0) {
                         for (const [otherRoomId, slots] of selectedSlots) {
                             if (otherRoomId !== roomId && slots.size > 0) {
@@ -664,12 +668,19 @@
 
             function updateFloatingAction() {
                 let totalSelected = 0;
-                for (const slots of selectedSlots.values()) {
-                    totalSelected += slots.size;
+                let selectedRoomName = '';
+
+                for (const [roomId, slots] of selectedSlots) {
+                    if (slots.size > 0) {
+                        totalSelected = slots.size;
+                        selectedRoomName = $(`.room-card[data-room-id="${roomId}"] h3`).text();
+                        break;
+                    }
                 }
 
                 if (totalSelected > 0) {
                     $('#selected-count').text(totalSelected);
+                    $('#selected-room-info').text(selectedRoomName);
                     $('#floating-action').removeClass('hidden');
                 } else {
                     $('#floating-action').addClass('hidden');
@@ -720,10 +731,12 @@
                 $('#modal-duration').text(durationText);
 
                 $('#booking-modal').removeClass('hidden');
+                $('body').addClass('overflow-hidden');
             }
 
             function closeBookingModal() {
                 $('#booking-modal').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
                 $('#booking-form')[0].reset();
             }
 
@@ -751,24 +764,16 @@
             }
 
             function showWaContact(booking, roomName) {
-                console.log('Booking data:', booking); // Debug
-
                 const bookingDate = $('#booking-date').val();
 
-                // Update modal content
                 $('#wa-borrower-name').text(booking.contact_name || 'Tidak diketahui');
                 $('#wa-activity').text(booking.activity || 'Tidak ada keterangan');
 
-                // Format time
                 const startTime = booking.start_time ? booking.start_time.substr(0, 5) : '';
                 const endTime = booking.end_time ? booking.end_time.substr(0, 5) : '';
 
-                // Check if WhatsApp number exists
                 if (booking.contact_phone) {
-                    // Format message (without sender name since public access)
                     const message = `Shalom, permisi saya mau berbicara mengenai peminjaman ruang ${roomName} pada tanggal ${formatDate(bookingDate)} di jam ${startTime} - ${endTime}.`;
-
-                    // Use already formatted WhatsApp number from API
                     const waNumber = booking.contact_phone;
                     const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
 
@@ -776,27 +781,25 @@
                     $('#wa-link').removeClass('hidden');
                     $('#no-wa-message').addClass('hidden');
                 } else {
-                    // No WhatsApp number available
                     $('#wa-link').addClass('hidden');
                     $('#no-wa-message').removeClass('hidden');
                 }
 
-                // Set cancel booking form action (for admin)
                 if (booking.id) {
                     const cancelUrl = `/admin/bookings/${booking.id}/cancel`;
                     $('#cancel-booking-form').attr('action', cancelUrl);
                 }
 
-                // Show modal
                 $('#wa-modal').removeClass('hidden');
+                $('body').addClass('overflow-hidden');
             }
 
             function closeWaModal() {
                 $('#wa-modal').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
             }
 
             function openTimeFilterModal() {
-                // Set current filter values if any
                 if (timeFilter.start) {
                     $('#filter-start-time').val(timeFilter.start);
                 }
@@ -804,13 +807,13 @@
                     $('#filter-end-time').val(timeFilter.end);
                 }
                 $('#time-filter-modal').removeClass('hidden');
+                $('body').addClass('overflow-hidden');
             }
 
             function applyTimeFilter() {
                 const startTime = $('#filter-start-time').val();
                 const endTime = $('#filter-end-time').val();
 
-                // Validate that end time is after start time if both selected
                 if (startTime && endTime) {
                     const startMinutes = timeToMinutes(startTime);
                     const endMinutes = timeToMinutes(endTime);
@@ -821,14 +824,12 @@
                     }
                 }
 
-                // Update filter state
                 timeFilter.start = startTime || null;
                 timeFilter.end = endTime || null;
 
-                // Close modal
                 $('#time-filter-modal').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
 
-                // Re-render all room slots with filter applied
                 const roomIds = [];
                 $('.room-card').each(function() {
                     roomIds.push($(this).data('room-id'));
@@ -840,18 +841,15 @@
             }
 
             function resetTimeFilter() {
-                // Reset filter state
                 timeFilter.start = null;
                 timeFilter.end = null;
 
-                // Reset form
                 $('#filter-start-time').val('');
                 $('#filter-end-time').val('');
 
-                // Close modal
                 $('#time-filter-modal').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
 
-                // Re-render all room slots without filter
                 const roomIds = [];
                 $('.room-card').each(function() {
                     roomIds.push($(this).data('room-id'));
